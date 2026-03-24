@@ -8,14 +8,48 @@
 // SSR (server side rendering) has to be disabled.
 // Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
 
-import React from "react";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useApi } from "@/hooks/useApi";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import { Button, Card } from "antd";
 
 const Profile: React.FC = () => {
+  const router = useRouter();
+  const apiService = useApi();
+  const { value: token, clear: clearToken } = useLocalStorage<string>("token", "");
+  const { value: userId, clear: clearUserId } = useLocalStorage<string>("userId", "");
+
+  // client#6 issue redirect to login if not authenticated
+  useEffect(() => {
+    if (!token) {
+      router.push("/login");
+    }
+  }, [token, router]);
+
+  // client#4 issue for logout: invalidate session and redirect to landing page
+  const handleLogout = async () => {
+    try {
+      await apiService.post(`/users/${userId}/logout`, {});
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      clearToken();
+      clearUserId();
+      router.push("/login");
+    }
+  };
+
   return (
     <div className="card-container">
-      <p>
-        <strong>SampleUser</strong>
-      </p>
+      <Card title="Profile">
+        <p>
+          <strong>SampleUser</strong>
+        </p>
+        <Button type="primary" danger onClick={handleLogout}>
+          Logout
+        </Button>
+      </Card>
     </div>
   );
 };

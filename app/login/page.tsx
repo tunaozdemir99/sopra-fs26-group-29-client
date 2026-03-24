@@ -11,12 +11,14 @@ import { Button, Form, Input } from "antd";
 interface FormFieldProps {
   label: string;
   value: string;
+  password: string;
 }
 
 const Login: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm();
+  const [error, setError] = useState<string | null>(null);
   // useLocalStorage hook example use
   // The hook returns an object with the value and two functions
   // Simply choose what you need from the hook:
@@ -40,15 +42,28 @@ const Login: React.FC = () => {
       // Navigate to the user overview
       router.push("/users");
     } catch (error) {
-      if (error instanceof Error) {
-        alert(`Something went wrong during the login:\n${error.message}`);
-      } else {
-        console.error("An unknown error occurred during login.");
-      }
-    }
+        if (error instanceof Error) {
+          setError(error.message);
+            } else {
+          setError("Invalid username or password.");
+        }
+  form.resetFields();
+  }
   };
 
   return (
+    <div className="login-container">
+      {error && (
+        <Alert
+          message="Error"
+          description={error}
+          type="error"
+          showIcon
+          closable
+          onClose={() => setError(null)}
+          style={{ marginBottom: 16 }}
+        />
+      )}
     <div className="login-container">
       <Form
         form={form}
