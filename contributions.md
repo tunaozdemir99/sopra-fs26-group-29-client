@@ -30,12 +30,13 @@ reason).
 
 ---
 
-## Contributions Week 1 - [Begin Date] to [End Date]
+## Contributions Week 1 - 23.03.2026 to 30.03.2026
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@adnana24i]** | 24.03.2026| https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/eb89f28ff93b425fe4a1ff870c9739d1d15eb146 | Implemented login and logout for the frontend, including the redirections for errors | This completes the user story 2 |
+|                    | 24.03.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/5d59dab41069bf58e503aa04cb5a78b06fce36df | Implemented integration tests for login and logout | This ensures correctitude of implementation of user story 2 |
+|                    | 24.03.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/e87556ebef251449fba5819f43aebe5cd281b079 | Implemented login and logout user services | This is the main implementation of user story 2 |
 | **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
