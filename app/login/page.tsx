@@ -4,13 +4,13 @@ import { useRouter } from "next/navigation"; // use NextJS router for navigation
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
-import { Button, Form, Input } from "antd";
+import { Alert, Button, Form, Input } from "antd";
+import React, { useState } from "react";
 // Optionally, you can import a CSS module or file for additional styling:
 // import styles from "@/styles/page.module.css";
 
 interface FormFieldProps {
-  label: string;
-  value: string;
+  username: string;
   password: string;
 }
 
@@ -32,7 +32,7 @@ const Login: React.FC = () => {
   const handleLogin = async (values: FormFieldProps) => {
     try {
       // Call the API service and let it handle JSON serialization and error handling
-      const response = await apiService.post<User>("/users", values);
+      const response = await apiService.post<User>("/users/login", values);
 
       // Use the useLocalStorage hook that returned a setter function (setToken in line 41) to store the token if available
       if (response.token) {
@@ -47,7 +47,7 @@ const Login: React.FC = () => {
             } else {
           setError("Invalid username or password.");
         }
-  form.resetFields();
+    form.resetFields();
   }
   };
 
@@ -64,7 +64,6 @@ const Login: React.FC = () => {
           style={{ marginBottom: 16 }}
         />
       )}
-    <div className="login-container">
       <Form
         form={form}
         name="login"
@@ -81,15 +80,18 @@ const Login: React.FC = () => {
           <Input placeholder="Enter username" />
         </Form.Item>
         <Form.Item
-          name="name"
-          label="Name"
-          rules={[{ required: true, message: "Please input your name!" }]}
+          name="password"
+          label="Password"
+          rules={[{ required: true, message: "Please input your password!" }]}
         >
-          <Input placeholder="Enter name" />
+          <Input placeholder="Enter password" />
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit" className="login-button">
             Login
+          </Button>
+          <Button className="login-button" onClick={() => router.push("/register") }>
+            Register Instead
           </Button>
         </Form.Item>
       </Form>
