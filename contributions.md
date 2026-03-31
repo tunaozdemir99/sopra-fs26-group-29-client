@@ -45,8 +45,10 @@ reason).
 |                    | 30.03.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/43fb49237ab73f848929c3839f5d41d52bb6b677 | Removed the name field for user. | This ensures that the user description fits the project requirements, and that the user data returned from the server is correctly structured. |
 |                    | 30.03.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/5cdc3cc982e4f76421dbb96511f81487251d3da5 | Fixed bugs in the login form. | These fixes were necessary for any login-dependent feature to work. |
 |                    | 30.03.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/bbb7b42f402c0975deb49bde366eab992c0fa002 | Implemented the client side registration flow, including redirecting the user to the dashboard on success and showing an error message on failure. | This completes the frontend side of user story 1, making the registration feature fully functional. |
-| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@stella-sy-x]** | [30.03.2026]   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/5ed2064df9fd1d631b2653cf737c8998eb9c042f | Add Trip entity, repository, service, controller, DTOs and tests (#30) | Core backend for trip creation; enables S4 user story and unblocks all trip-related features |
+|                    | [30.03.2026]   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/2810893416b87a7de80fb55a253ddebc78671935 | Fix User tests: remove stale name references, add password, update status to ONLINE | Fixes ~25 broken tests caused by incomplete M1 cleanup, unblocks CI pipeline |
+|                    | [30.03.2026]   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/c7ed4207c44f929bba04437e5a778f1b24714ec1 | Set User token as nullable to fix logout logic | Resolves DB constraint conflict that prevented logout from working |
+|                    | [30.03.2026]   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/8871734c39e845e91036395f11e1bc2b35c82a8a | Add location field to Trip entity, DTOs, and mapper (#28) | Extends trip creation to support location data per issue requirements |
 
 ---
 
