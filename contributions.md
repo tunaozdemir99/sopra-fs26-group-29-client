@@ -52,12 +52,12 @@ reason).
 
 ---
 
-## Contributions Week 2 - 01.04.2026 to 08.04.2026
+## Contributions Week 2 - 08.04.2026 to 14.04.2026
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@stella-sy-x]** | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/4122ca85a3fa7198f3b2b6a233a81029fe76e278 | Add member-only authorization check to trip dashboard endpoint (#51) | Enforces access control for S14 trip dashboard: non-members receive 403 per M2 API spec |
+|                    | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/011e6dc5b85d25b8cae62806cde022baa7a375d8 | Add trip dashboard page with trip overview, navigation tabs, and placeholder cards (#25) | Implements S14 frontend: central navigation hub for all trip-related features with clear extension points for pending user stories |
 | **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
