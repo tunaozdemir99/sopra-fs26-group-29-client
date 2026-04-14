@@ -28,7 +28,7 @@ const Login: React.FC = () => {
     // clear: clearToken, // is commented out because we do not need to clear the token when logging in
   } = useLocalStorage<string>("token", ""); // note that the key we are selecting is "token" and the default value we are setting is an empty string
   // if you want to pick a different token, i.e "usertoken", the line above would look as follows: } = useLocalStorage<string>("usertoken", "");
-  const { set: setUsername } = useLocalStorage<string>("username", "");
+  const { set: setUserId } = useLocalStorage<string>("userId", "");
 
   const handleLogin = async (values: FormFieldProps) => {
     try {
@@ -40,12 +40,10 @@ const Login: React.FC = () => {
         setToken(response.token);
       }
 
-      if (response.username) {
-        setUsername(response.username);
-      }
-      
-      // Navigate to the user overview
-      router.push("/users");
+      setUserId(String(response.id));
+
+      // Navigate to the user's trip dashboard
+      router.push(`/users/${response.id}/trips`);
     } catch (error) {
         if (error instanceof Error) {
           setError(error.message);

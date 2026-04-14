@@ -1,9 +1,14 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 export default function Home() {
-  return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-      <h1 style={{ color: "red" }}>Group 29</h1>
-    </div>
-  );
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace("/register");
+  }, [router]);
+
+  return null;
 }
