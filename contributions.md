@@ -58,8 +58,33 @@ reason).
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
 | **[@stella-sy-x]** | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/4122ca85a3fa7198f3b2b6a233a81029fe76e278 | Add member-only authorization check to trip dashboard endpoint (#51) | Enforces access control for S14 trip dashboard: non-members receive 403 per M2 API spec |
 |                    | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/011e6dc5b85d25b8cae62806cde022baa7a375d8 | Add trip dashboard page with trip overview, navigation tabs, and placeholder cards (#25) | Implements S14 frontend: central navigation hub for all trip-related features with clear extension points for pending user stories |
-| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@adnana24i]** | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/ea1234053fb89e1809e388b2e2d87f67912796d3 | Added Create Trip button on the Dashboard
+   and set up navigation redirects to support the trip creation flow | Completes the UI entry point for trip creation|                                               
+  |                    | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/51ffe01297f05ca87632410e04ed2b13baeddfbf | Implemented redirect from trip creation
+   form to the Trip Overview page on success | Ensures easier navigation after creating a trip|                                                                    
+  |                    | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/4079725dd52b69ea486f99e51ec481aa634c782c | Built the full Timeline UI: display of
+  scheduled activities, adding/deleting items, assigning from bucket, and showing travel time between stops | Core frontend for the trip planning timeline feature|
+  |                    | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/51c429046cfe7a7b0aac4f73981e3391ca83530b | Fixed auth token reading from          
+  localStorage on app init and corrected parsing of JSON-wrapped tokens | Resolves authentication state persistence bugs|                                       
+  |                    | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/be0a27da5a4e5880cd192c49481ab386e5812d81 | Improved the Auth UI (login/register
+  pages) and added proper error handling for server-side errors | Enhances user experience during authentication|                                            
+  |                    | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/da8b6ed967c4bb021cb0116dbb9ffee3abe6ba21 | Redesigned the Dashboard layout and the
+   Trip creation form for better usability | Improves the main entry points of the app, fulfilling issues|                                                                         
+  |                    | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/64e64a7396d46e7d693414aa61e66527ec0d6d0a | Implemented the Trip Overview page with
+   real-time Bucket display, Google Maps integration, and Geocoding for trip locations | Core frontend for viewing trip details |                           
+  |                    | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/a3fe0ee6f39d1b6290cf6f75cdf02ce290201e04 | Added GET /users/{userId}/trips
+  endpoint to retrieve trips for a user | Enables the frontend to list user trips, supporting dashboard and navigation, fulfilling issues #7 #8 |                                          
+  |                    | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/739df2c7a9b3479195e6286e2eac5987481b137b | Implemented timeline REST endpoints:
+  get daily timeline, schedule a bucket item as an activity, and delete an activity | Core backend for the timeline feature|                            
+  |                    | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/363521a3693d98cdc89908e034d8bd09c56eac65 | Integrated Google Maps Routes API to
+  automatically calculate travel time between timeline activities | Enables travel time display in the timeline, fulfilling issues|                                           
+  |                    | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/4d8531dd18a10440bbbcc065fec67a904f69a7f2 | Implemented the full BucketItem service
+   logic including CRUD operations and trip membership validation | Core backend for the Idea Bucket feature, fulfilling issues |                                                  
+  |                    | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/22a8445b479f6db962ea5cd1b308f658dff545e9 | Fixed a minor bug in the logout
+  endpoint | Ensures users can log out correctly|                                                                                                                    
+  |                    | 14.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/5eba61d6e63ba4e5ca646c5426d2389c7f751074 | Defined the BucketItem entity with its
+  DTOs and mappings | Foundation for the Idea Bucket feature |  
+
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
