@@ -391,7 +391,7 @@ const TripOverviewPage: React.FC = () => {
         open={bucketModalOpen}
         onCancel={() => { setBucketModalOpen(false); bucketForm.resetFields(); ideaLocationRef.current = null; }}
         footer={null}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={bucketForm} layout="vertical" onFinish={handleAddIdea} style={{ marginTop: 16 }}>
           <Form.Item name="name" label="Title" rules={[{ required: true, message: "Name is required" }]}>
@@ -442,7 +442,7 @@ const TripOverviewPage: React.FC = () => {
         open={activityModalOpen}
         onCancel={() => { setActivityModalOpen(false); activityForm.resetFields(); activityLocationRef.current = null; }}
         footer={null}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={activityForm} layout="vertical" onFinish={handleAddActivity} style={{ marginTop: 16 }}>
           <Form.Item name="bucketItemId" label="Idea from bucket" rules={[{ required: true, message: "Please select an idea" }]}>
