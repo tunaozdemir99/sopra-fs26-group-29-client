@@ -30,6 +30,7 @@ const TimelinePage: React.FC = () => {
   const { tripId } = useParams<{ tripId: string }>();
   const router = useRouter();
   const apiService = useApi();
+  const [messageApi, contextHolder] = message.useMessage();
   const { value: token } = useLocalStorage<string>("token", "");
   const [activities, setActivities] = useState<Activity[]>([]);
   const [bucketItems, setBucketItems] = useState<BucketItem[]>([]);
@@ -98,11 +99,11 @@ const TimelinePage: React.FC = () => {
       });
       form.resetFields();
       setModalOpen(false);
-      message.success("Activity scheduled!");
+      messageApi.success("Activity scheduled!");
       fetchActivities();
     } catch (error) {
       const e = error as Error;
-      message.error(e.message ?? "Failed to schedule activity");
+      messageApi.error(e.message ?? "Failed to schedule activity");
     } finally {
       setSubmitting(false);
     }
@@ -111,11 +112,11 @@ const TimelinePage: React.FC = () => {
   const handleDelete = async (activityId: number) => {
     try {
       await apiService.delete(`/trips/${tripId}/timeline/${activityId}`);
-      message.success("Activity removed.");
+      messageApi.success("Activity removed.");
       fetchActivities();
     } catch (error) {
       const e = error as Error;
-      message.error(e.message ?? "Failed to remove activity");
+      messageApi.error(e.message ?? "Failed to remove activity");
     }
   };
 
@@ -157,14 +158,14 @@ const TimelinePage: React.FC = () => {
           longitude: values.longitude ?? null,
         },
       );
-      message.success("Activity updated.");
+      messageApi.success("Activity updated.");
       setEditModalOpen(false);
       setEditingActivity(null);
       editForm.resetFields();
       fetchActivities();
     } catch (error) {
       const e = error as Error;
-      message.error(e.message ?? "Failed to update activity");
+      messageApi.error(e.message ?? "Failed to update activity");
     } finally {
       setEditSubmitting(false);
     }
@@ -199,6 +200,7 @@ const TimelinePage: React.FC = () => {
 
   return (
     <div className="card-container">
+      {contextHolder}
       <div style={{ width: "100%", maxWidth: 680 }}>
         <div style={{ marginBottom: 16 }}>
           <Button
