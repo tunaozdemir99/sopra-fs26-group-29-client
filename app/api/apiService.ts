@@ -9,7 +9,8 @@ export class ApiService {
   }
 
   private getHeaders(): HeadersInit {
-    const token = localStorage.getItem("token");
+    const raw = localStorage.getItem("token");
+    const token = raw ? JSON.parse(raw) : null;
     return {
       "Content-Type": "application/json",
       ...(token ? { "Authorization": `Bearer ${token}` } : {}),
