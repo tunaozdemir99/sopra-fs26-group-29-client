@@ -30,6 +30,7 @@ const IdeaBucketPage: React.FC = () => {
   const [editForm] = Form.useForm();
   const [scheduleForm] = Form.useForm();
   const locationRef = useRef<SelectedLocation | null>(null);
+  const editLocationRef = useRef<SelectedLocation | null>(null);
 
   const fetchItems = useCallback(async () => {
     try {
@@ -66,12 +67,18 @@ const IdeaBucketPage: React.FC = () => {
   const handleEdit = async (values: { name: string; location?: string; description?: string }) => {
     if (!editingItem) return;
     try {
+      const payload: Record<string, unknown> = { ...values };
+      if (editLocationRef.current) {
+        payload.latitude = editLocationRef.current.lat;
+        payload.longitude = editLocationRef.current.lng;
+      }
       const updated = await apiService.patch<BucketItem>(
-        `/trips/${tripId}/bucketItems/${editingItem.bucketItemId}`, values
+        `/trips/${tripId}/bucketItems/${editingItem.bucketItemId}`, payload
       );
       setItems((prev) => prev.map((i) => i.bucketItemId === updated.bucketItemId ? updated : i));
       setEditingItem(null);
       editForm.resetFields();
+      editLocationRef.current = null;
       message.success("Idea updated!");
     } catch (e) { message.error((e as Error).message ?? "Failed to update idea"); }
   };
@@ -209,7 +216,7 @@ const IdeaBucketPage: React.FC = () => {
           <Form.Item name="description" label="Description">
             <Input.TextArea rows={2} placeholder="Any details..." />
           </Form.Item>
-          <Form.Item label="Location">
+          <Form.Item label="Location" required rules={[{ required: true, message: "Location is required" }]}>
             <LocationSearch
               placeholder="Search for a location..."
               onSelect={(loc) => {
@@ -217,7 +224,9 @@ const IdeaBucketPage: React.FC = () => {
                 form.setFieldValue("location", loc.label.split(",")[0]);
               }}
             />
-            <Form.Item name="location" noStyle><Input type="hidden" /></Form.Item>
+          <Form.Item name="location" noStyle rules={[{ required: true, message: "Location is required" }]}>
+            <Input type="hidden" />
+          </Form.Item>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={submitting} block>Add to Bucket</Button>
@@ -250,15 +259,30 @@ const IdeaBucketPage: React.FC = () => {
       <Modal
         title="Edit Idea"
         open={editingItem !== null}
-        onCancel={() => { setEditingItem(null); editForm.resetFields(); }}
+        onCancel={() => { setEditingItem(null); editForm.resetFields(); editLocationRef.current = null; }}
         footer={null}
       >
         <Form form={editForm} layout="vertical" onFinish={handleEdit} style={{ marginTop: 16 }}>
           <Form.Item name="name" label="Title" rules={[{ required: true, message: "Name is required" }]}>
-            <Input />
+            <Input placeholder="e.g. Visit the Eiffel Tower" />
           </Form.Item>
-          <Form.Item name="location" label="Location"><Input /></Form.Item>
-          <Form.Item name="description" label="Description"><Input.TextArea rows={2} /></Form.Item>
+          <Form.Item name="description" label="Description">
+            <Input.TextArea rows={2} placeholder="Any details..." />
+          </Form.Item>
+          <Form.Item label="Location" required rules={[{ required: true, message: "Location is required" }]}>
+            <LocationSearch
+              key={editingItem?.bucketItemId ?? 0}
+              placeholder="Search for a location..."
+              initialValue={editingItem?.location ?? ""}
+              onSelect={(loc) => {
+                editLocationRef.current = loc;
+                editForm.setFieldValue("location", loc.label.split(",")[0]);
+              }}
+            />
+            <Form.Item name="location" noStyle rules={[{ required: true, message: "Location is required" }]}>
+              <Input type="hidden" />
+            </Form.Item>
+          </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" block>Save Changes</Button>
           </Form.Item>

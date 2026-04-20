@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
-import { Input, Button, List, Spin, Typography } from "antd";
-import { SearchOutlined, EnvironmentOutlined } from "@ant-design/icons";
+import React, { useState, useEffect, useRef } from "react";
+import { Input, List, Spin, Typography } from "antd";
+import { EnvironmentOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
@@ -33,16 +33,17 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   const [results, setResults] = useState<GeoResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<SelectedLocation | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const skipSearchRef = useRef(false);
+  const userTypedRef = useRef(false);
 
-  const search = async () => {
-    if (!query.trim()) return;
+  const search = async (q: string) => {
+    if (!q.trim()) { setResults([]); return; }
     setLoading(true);
     setResults([]);
     try {
-      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5`;
-      const res = await fetch(url, {
-        headers: { "Accept-Language": "en" },
-      });
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=5`;
+      const res = await fetch(url, { headers: { "Accept-Language": "en" } });
       const data: GeoResult[] = await res.json();
       setResults(data);
     } catch {
@@ -52,12 +53,21 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     }
   };
 
+  useEffect(() => {
+    if (!userTypedRef.current) return;
+    if (skipSearchRef.current) { skipSearchRef.current = false; return; }
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => search(query), 400);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [query]);
+
   const handleSelect = (item: GeoResult) => {
     const loc: SelectedLocation = {
       label: item.display_name,
       lat: parseFloat(item.lat),
       lng: parseFloat(item.lon),
     };
+    skipSearchRef.current = true;
     setSelected(loc);
     setResults([]);
     setQuery(item.display_name.split(",")[0]);
@@ -66,22 +76,13 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
 
   return (
     <div style={{ position: "relative" }}>
-      <div style={{ display: "flex", gap: 8 }}>
-        <Input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onPressEnter={search}
-          placeholder={placeholder}
-          prefix={<EnvironmentOutlined style={{ color: "#2563eb" }} />}
-        />
-        <Button icon={<SearchOutlined />} onClick={search} loading={loading} />
-      </div>
-
-      {loading && (
-        <div style={{ textAlign: "center", marginTop: 8 }}>
-          <Spin size="small" />
-        </div>
-      )}
+      <Input
+        value={query}
+        onChange={(e) => { userTypedRef.current = true; setQuery(e.target.value); setSelected(null); }}
+        placeholder={placeholder}
+        prefix={<EnvironmentOutlined style={{ color: "#2563eb" }} />}
+        suffix={loading ? <Spin size="small" /> : null}
+      />
 
       {results.length > 0 && (
         <div style={{
