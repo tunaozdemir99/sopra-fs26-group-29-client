@@ -5,8 +5,10 @@ import { useParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { Button, Card, Form, Input, Modal, Empty, message, Typography, Popconfirm } from "antd";
-import { PlusOutlined, DeleteOutlined, EditOutlined, EnvironmentOutlined } from "@ant-design/icons";
+import { App, Button, Card, DatePicker, Form, Input, Modal, Empty, TimePicker, Typography, Popconfirm } from "antd";
+import dayjs from "dayjs";
+import type { Dayjs } from "dayjs";
+import { BulbOutlined, DeleteOutlined, EditOutlined, EnvironmentOutlined, CalendarOutlined } from "@ant-design/icons";
 import { BucketItem } from "@/types/bucketItem";
 import type { SelectedLocation } from "@/components/LocationSearch";
 
@@ -17,13 +19,16 @@ const { Title, Text } = Typography;
 const IdeaBucketPage: React.FC = () => {
   const { tripId } = useParams<{ tripId: string }>();
   const apiService = useApi();
-  const { value: currentUsername } = useLocalStorage<string>("username", "");
+  const { notification, message } = App.useApp();
+  const { value: currentUserId } = useLocalStorage<string>("userId", "");
   const [items, setItems] = useState<BucketItem[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<BucketItem | null>(null);
+  const [schedulingItem, setSchedulingItem] = useState<BucketItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
+  const [scheduleForm] = Form.useForm();
   const locationRef = useRef<SelectedLocation | null>(null);
 
   const fetchItems = useCallback(async () => {
@@ -53,7 +58,7 @@ const IdeaBucketPage: React.FC = () => {
       form.resetFields();
       locationRef.current = null;
       setModalOpen(false);
-      message.success("Idea added!");
+      notification.success({ title: "Bucket item created successfully!", placement: "bottomRight", className: "custom-notification" });
     } catch (e) { message.error((e as Error).message ?? "Failed to add idea"); }
     finally { setSubmitting(false); }
   };
@@ -79,10 +84,35 @@ const IdeaBucketPage: React.FC = () => {
     } catch (e) { message.error((e as Error).message ?? "Failed to delete idea"); }
   };
 
+  const handleSchedule = async (values: { date: Dayjs; startTime: Dayjs; endTime: Dayjs }) => {
+  if (!schedulingItem) return;
+  try {
+    await apiService.post(`/trips/${tripId}/timeline`, {
+      bucketItemId: schedulingItem.bucketItemId,
+      date: values.date.format("YYYY-MM-DD"),
+      startTime: values.startTime.format("HH:mm"),
+      endTime: values.endTime.format("HH:mm"),
+    });
+    setSchedulingItem(null);
+    scheduleForm.resetFields();
+    message.success("Activity scheduled!");
+  } catch (e) { message.error((e as Error).message ?? "Failed to schedule"); }
+  };
+
+
   return (
     <div style={{ padding: "16px 0" }}>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
+        <div>
+          <Title level={3} style={{ margin: 0, color: "#111" }}>Idea Bucket</Title>
+          <Text type="secondary">Share and vote on ideas for this trip</Text>
+        </div>
+        <Button
+          type="primary"
+          icon={<BulbOutlined />}
+          onClick={() => setModalOpen(true)}
+          style={{ background: "#111", borderColor: "#111" }}
+        >
           Add Idea
         </Button>
       </div>
@@ -90,31 +120,43 @@ const IdeaBucketPage: React.FC = () => {
       {items.length === 0 ? (
         <Empty description="No ideas yet. Be the first to add one!" />
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
           {items.map((item) => (
-            <Card key={item.bucketItemId} style={{ borderLeft: "4px solid #2563eb" }}>
+            <Card
+              key={item.bucketItemId}
+              style={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
+              styles={{ body: { padding: 20 } }}
+            >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div>
-                  <Title level={5} style={{ margin: "0 0 4px", color: "#111" }}>{item.name}</Title>
-                  {item.location && (
-                    <Text type="secondary" style={{ display: "block" }}>
-                      <EnvironmentOutlined /> {item.location}
-                    </Text>
-                  )}
-                  {item.description && (
-                    <Text style={{ display: "block", color: "#555", marginTop: 4 }}>{item.description}</Text>
-                  )}
-                  <Text type="secondary" style={{ fontSize: 12 }}>Added by {item.addedBy}</Text>
-                </div>
-                {item.addedBy === currentUsername && (
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <Button size="small" icon={<EditOutlined />}
-                      onClick={() => { setEditingItem(item); editForm.setFieldsValue(item); }} />
+                <Title level={5} style={{ margin: 0, color: "#111", flex: 1, paddingRight: 8 }}>{item.name}</Title>
+                {item.addedBy.id === Number(currentUserId) && (
+                  <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+                    <Button
+                      type="text" size="small"
+                      icon={<EditOutlined style={{ color: "#2563eb" }} />}
+                      onClick={() => { setEditingItem(item); editForm.setFieldsValue(item); }}
+                    />
                     <Popconfirm title="Delete this idea?" onConfirm={() => handleDelete(item.bucketItemId)} okText="Yes" cancelText="No">
-                      <Button size="small" danger icon={<DeleteOutlined />} />
+                      <Button type="text" size="small" icon={<DeleteOutlined style={{ color: "#ef4444" }} />} />
                     </Popconfirm>
                   </div>
                 )}
+              </div>
+              {item.location && (
+                <Text type="secondary" style={{ display: "block", marginTop: 6, fontSize: 13 }}>
+                  <EnvironmentOutlined style={{ marginRight: 4 }} />{item.location}
+                </Text>
+              )}
+              <Text type="secondary" style={{ display: "block", fontSize: 12, marginTop: 4 }}>
+                by {item.addedBy.username}
+              </Text>
+              {item.description && (
+                <Text style={{ display: "block", color: "#6b7280", fontSize: 13, marginTop: 6 }}>{item.description}</Text>
+              )}
+              <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #f0f0f0" }}>
+                <Button size="small" icon={<CalendarOutlined />} onClick={() => setSchedulingItem(item)}>
+                  Schedule
+                </Button>
               </div>
             </Card>
           ))}
@@ -147,6 +189,28 @@ const IdeaBucketPage: React.FC = () => {
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={submitting} block>Add to Bucket</Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="Schedule Idea"
+        open={schedulingItem !== null}
+        onCancel={() => { setSchedulingItem(null); scheduleForm.resetFields(); }}
+        footer={null}
+      >
+        <Form form={scheduleForm} layout="vertical" onFinish={handleSchedule} style={{ marginTop: 16 }}>
+          <Form.Item name="date" label="Date" rules={[{ required: true, message: "Date is required" }]}>
+            <DatePicker style={{ width: "100%" }} disabledDate={(d) => d.isBefore(dayjs().startOf("day"))} />
+          </Form.Item>
+          <Form.Item name="startTime" label="Start Time" rules={[{ required: true, message: "Start time is required" }]}>
+            <TimePicker style={{ width: "100%" }} format="HH:mm" minuteStep={15} />
+          </Form.Item>
+          <Form.Item name="endTime" label="End Time" rules={[{ required: true, message: "End time is required" }]}>
+            <TimePicker style={{ width: "100%" }} format="HH:mm" minuteStep={15} />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>Schedule Activity</Button>
           </Form.Item>
         </Form>
       </Modal>

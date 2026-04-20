@@ -7,7 +7,7 @@ import {
   Button, Card, DatePicker, Form, InputNumber, Modal, Empty,
   message, Select, TimePicker, Typography, Input, Tag,
 } from "antd";
-import { DeleteOutlined, EditOutlined, PlusOutlined, EnvironmentOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined, EnvironmentOutlined, ClockCircleOutlined, BulbOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import { Activity } from "@/types/activity";
@@ -275,6 +275,9 @@ const TimelinePage: React.FC = () => {
                       <Tag icon={<ClockCircleOutlined />} color="blue" style={{ margin: 0 }}>
                         {duration}
                       </Tag>
+                    )}
+                    {activity.fromBucketItem && (
+                      <Tag icon={<BulbOutlined />} color="gold" style={{ margin: 0 }}>From Idea Bucket</Tag>
                     )}
                   </div>
                   <Text type="secondary" style={{ display: "block", marginTop: 4 }}>
