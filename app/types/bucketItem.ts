@@ -6,6 +6,6 @@ export interface BucketItem {
   /** Available once the backend exposes these fields on BucketItem */
   latitude?: number;
   longitude?: number;
-  addedBy: string;
+  addedBy: { id: number; username: string };
   voteScore: number;
 }
