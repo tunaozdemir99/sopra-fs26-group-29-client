@@ -8,7 +8,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { App, Button, Card, DatePicker, Form, Input, Modal, Empty, TimePicker, Typography, Popconfirm } from "antd";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
-import { BulbOutlined, DeleteOutlined, EditOutlined, EnvironmentOutlined, CalendarOutlined } from "@ant-design/icons";
+import { BulbOutlined, DeleteOutlined, EditOutlined, EnvironmentOutlined, CalendarOutlined, LikeOutlined, DislikeOutlined } from "@ant-design/icons";
 import { BucketItem } from "@/types/bucketItem";
 import type { SelectedLocation } from "@/components/LocationSearch";
 
@@ -84,6 +84,14 @@ const IdeaBucketPage: React.FC = () => {
     } catch (e) { message.error((e as Error).message ?? "Failed to delete idea"); }
   };
 
+  const handleVote = async (item: BucketItem, value: number) => {
+    const newValue = item.myVote === value ? 0 : value;
+    try {
+      const updated = await apiService.post<BucketItem>(`/trips/${tripId}/bucketItems/${item.bucketItemId}/vote`, { value: newValue });
+      setItems((prev) => prev.map((i) => i.bucketItemId === updated.bucketItemId ? updated : i));
+    } catch (e) { message.error((e as Error).message ?? "Failed to vote"); }
+  };
+
   const handleSchedule = async (values: { date: Dayjs; startTime: Dayjs; endTime: Dayjs }) => {
   if (!schedulingItem) return;
   try {
@@ -153,7 +161,31 @@ const IdeaBucketPage: React.FC = () => {
               {item.description && (
                 <Text style={{ display: "block", color: "#6b7280", fontSize: 13, marginTop: 6 }}>{item.description}</Text>
               )}
-              <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #f0f0f0" }}>
+              <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #f0f0f0", display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{
+                  minWidth: 32, textAlign: "center", fontWeight: 600, fontSize: 13,
+                  padding: "2px 8px", borderRadius: 6,
+                  background: item.voteScore > 0 ? "#dcfce7" : item.voteScore < 0 ? "#fee2e2" : "#f3f4f6",
+                  color: item.voteScore > 0 ? "#16a34a" : item.voteScore < 0 ? "#dc2626" : "#6b7280",
+                }}>
+                  {item.voteScore > 0 ? `+${item.voteScore}` : item.voteScore}
+                </span>
+                <Button
+                  size="small"
+                  icon={<LikeOutlined />}
+                  onClick={() => handleVote(item, 1)}
+                  style={item.myVote === 1 ? { background: "#111", color: "#fff", borderColor: "#111" } : {}}
+                >
+                  {item.voteScore > 0 ? item.voteScore : 0}
+                </Button>
+                <Button
+                  size="small"
+                  icon={<DislikeOutlined />}
+                  onClick={() => handleVote(item, -1)}
+                  style={item.myVote === -1 ? { background: "#111", color: "#fff", borderColor: "#111" } : {}}
+                >
+                  {item.voteScore < 0 ? Math.abs(item.voteScore) : 0}
+                </Button>
                 <Button size="small" icon={<CalendarOutlined />} onClick={() => setSchedulingItem(item)}>
                   Schedule
                 </Button>

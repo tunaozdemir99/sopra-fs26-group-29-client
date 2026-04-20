@@ -8,4 +8,5 @@ export interface BucketItem {
   longitude?: number;
   addedBy: { id: number; username: string };
   voteScore: number;
+  myVote: number;
 }
