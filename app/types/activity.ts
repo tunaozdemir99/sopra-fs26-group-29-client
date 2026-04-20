@@ -8,5 +8,7 @@ export interface Activity {
   locationName: string | null;
   latitude: number | null;
   longitude: number | null;
+  durationMinutes: number | null;
   travelTimeToNextActivity: number | null;
+  gapToNextActivityMinutes: number | null;
 }

@@ -21,13 +21,15 @@ export interface SelectedLocation {
 interface LocationSearchProps {
   onSelect: (location: SelectedLocation) => void;
   placeholder?: string;
+  initialValue?: string;
 }
 
 const LocationSearch: React.FC<LocationSearchProps> = ({
   onSelect,
   placeholder = "Search for a location...",
+  initialValue = "",
 }) => {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialValue);
   const [results, setResults] = useState<GeoResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<SelectedLocation | null>(null);
