@@ -86,9 +86,24 @@ reason).
 
 ---
 
-## Contributions Week 3 - [Begin Date] to [End Date]
+## Contributions Week 3 - 15.04.2026 to 21.04.2026
 
-_Continue with the same table format as above._
+| **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
+| ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| **[@adnana24i]** | 19.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/d573bdd08ea7ec33094b5e6d9d0754287105811e | Added tests for the activity service and controller, covering scheduling, deletion, conflict detection, and the Google Maps travel time integration | Ensures correctness of the core timeline feature for all activity-related endpoints |
+|                    | 19.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/06bab871dade9fe894692bc142b0e2b9a9d00f6e | Added full test coverage for the bucket item service and controller | Validates the complete Idea Bucket feature end-to-end|
+|                    | 19.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/6eee872c9fafa5a49bb6bfb397e4388a32d7aba6 | Added unit tests for login and logout in the user service | Ensures authentication flows remain correct |
+|                    | 19.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/80d8c8a7bbcbee4f2b7f45a87bbd6ff947d03c80 | Fixed broken activity tests after backend refactoring | Fix CI build failures following S6 service layer updates |
+|                    | 20.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/ac1c0746d11aab598e04166d27b7f6e4df578fc2 | Fixed bug where scheduling a bucket item as an activity deleted it from the bucket; also added durationMinutes and gapToNextActivityMinutes to the activity response DTO | Ideas must remain in the bucket after scheduling; the new DTO fields are required for the frontend timeline display |
+|                    | 20.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/68311a7e7b0ff98e480f486f19ea780f27090631 | Implemented travel time and conflict management in the timeline interface: client-side travel time computation between consecutive same-day activities, gap/free-time/conflict indicators, location search with maps, and activity duration badges | Completes the visual scheduling of the timeline, making conflicts and travel constraints visible to all trip members |
+| **[@tunaozdemir99]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@stella-sy-x]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@eoyelana]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@dogamentese]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 
 ---
 
