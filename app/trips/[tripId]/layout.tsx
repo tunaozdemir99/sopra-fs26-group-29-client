@@ -28,6 +28,7 @@ export default function TripLayout({ children }: { children: React.ReactNode }) 
     try {
       const data = await apiService.get<Trip>(`/trips/${tripId}`);
       setTrip(data);
+      localStorage.setItem(`trip-${tripId}-admin`, JSON.stringify(data.adminUsername ?? ""));
     } catch { /* ignore */ } finally { setLoading(false); }
   }, [apiService, tripId]);
 
