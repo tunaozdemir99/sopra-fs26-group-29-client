@@ -10,6 +10,7 @@ import { Activity } from "@/types/activity";
 import { Task } from "@/types/task";
 import { Member } from "@/types/member";
 import { Trip } from "@/types/trip";
+import useLocalStorage from "@/hooks/useLocalStorage";
 
 const { Text } = Typography;
 
@@ -22,6 +23,7 @@ const OverviewPage: React.FC = () => {
   const [tasks, setTasks]             = useState<Task[]>([]);
 
   const [adminUsername, setAdminUsername] = useState<string>("");
+  const { value: userId } = useLocalStorage<string>("userId", "");
 
   const fetchData = useCallback(async () => {
     try {
@@ -137,7 +139,7 @@ const OverviewPage: React.FC = () => {
           <Text strong><UnorderedListOutlined style={{ marginRight: 6 }} />Trip Tasks</Text>
           {countBadge(tasks.length)}
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
           {[
             { label: "To Do",       count: toDo,       bg: "#f9fafb", border: "#e5e7eb", color: "#374151" },
             { label: "In Progress", count: inProgress,  bg: "#eff6ff", border: "#bfdbfe", color: "#1d4ed8" },
@@ -152,6 +154,16 @@ const OverviewPage: React.FC = () => {
             </div>
           ))}
         </div>
+        {(() => {
+          const assignedToMe = tasks.filter(t => String(t.assignee.id) === String(userId)).length;
+          return assignedToMe > 0 ? (
+            <div style={{ background: "#eff6ff", borderRadius: 6, padding: "6px 10px" }}>
+              <Text style={{ fontSize: 12, color: "#2563eb" }}>
+                {assignedToMe} task{assignedToMe !== 1 ? "s" : ""} assigned to you
+              </Text>
+            </div>
+          ) : null;
+        })()}
       </Card>
 
     </div>
