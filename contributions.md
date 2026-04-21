@@ -56,6 +56,8 @@ reason).
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| **[@dogamentese]** | 12.04.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/683636f472dd610cd25886ee29488e9c15a1c49a | Implemented the backend support for the task feature, including entity, repository and task status. | Essential implementations for user story 13. |
+|                    | 12.04.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/8cdbde45215ecab136719bd8282dc3ddb7fcead1 | Implemented the task backend with service, DTOs and controller, with REST endpoints. | This provides all the required backend support for user story 13. |
 | **[@tunaozdemir99]** | 13.04.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/dfbe753f940b6c67cd7a3406a84479943015c9c1 | Implemented the backend support for the trip activity  feature, including entity, repository, DTOs, service logic, and REST endpoints.  | This allows the bucket items to be scheduled as activities to the trip activity timeline. |
 |                    | 13.04.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/f9136c590a0fd4a7a44d8a284e95337b7775b249 | Added PATCH and DELETE endpoints for bucket items in the controller and service, with ownership validation ensuring only the item's author can modify or remove it. | Provides the backend enforcement of the "edit or delete by author" rule, which is a core feature of user story 8. |
 |                    | 13.04.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/9e3d6bafd550e056f09fa9efd013be68938fde19 | Adds Edit and Delete buttons to each idea card on the Idea Bucket page, visible only to the item's author. | Completes the frontend side of the "edit or delete by author" feature, working together with the backend ownership checks to fully restrict modifications to the member who added the idea. | 
@@ -102,12 +104,16 @@ reason).
 |                    | 20.04.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/8fa948b31090bc46838c2f3071e54f86ea2f2ff8 | Client side fix of updating the bucket item response to include the creator's full user info instead of just their username.| Allows the app to correctly identify who created each idea, so only the creator sees the edit and delete buttons on their own ideas (which previously did not work). |
 |                    | 20.04.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/c105e007359b60bc2879fda85c25509fb637af2f | Implements the client side of the idea bucket voting feature, with the ability to upvote or downvote, change or rectract vote with their respective buttons/actions. | This implementation is essential for user story 9. |
 |                    | 20.04.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/733c3dae44d755c404a38815a0ccd62bc3a93422 | Added tests that cover the core logic and features of idea bucket. | Covers the idea bucket feature end to end and makes sure the rules around access and voting are enforced. |
+| **[@dogamentese]** | 20.04.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/4fb49c78824597e4e33f6c9f7806894c771ffcce | Updated the backend support for task feature, making it functional with correct required form values. | Allows for users to correctly create a task, core of user story 13. |
+|                    | 20.04.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/201ee8e65802cb07ed947d1990e904d95bc9e831 | Implemented all the tests related to the task feature. | Tests check all the functional logic required for task feature to successfully work. |
+|                    | 20.04.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/70fe371e918f1f0942dc678d4010b0c001d8c116 | Implemented the UI for task creation and improved navigation between trip tabs. | Ensures that users can efficiently navigate through the app, and use the task feature. |
+|                    | 21.04.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/1390fde328185652b22302285d8dd128a4acb4e0 | Updated the trip overview page to match the mockup UI's. | Ensures that users can efficiently navigate through the app. |
+|                    | 21.04.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/79b2cfe5646f7b02cb4ea062c98c400a32cb3462 | Updated the task tab to match the mockup UI's. | Ensures that users can efficiently use the task feature. |
 | **[@stella-sy-x]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@eoyelana]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@eoyelana]**    | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@dogamentese]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+
 
 ---
 
