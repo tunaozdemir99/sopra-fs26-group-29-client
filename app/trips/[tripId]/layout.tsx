@@ -5,7 +5,7 @@ import { useParams, useRouter, usePathname } from "next/navigation";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useApi } from "@/hooks/useApi";
 import { Button, Card, Tabs, Typography, Spin } from "antd";
-import { ArrowLeftOutlined, CalendarOutlined, TeamOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, CalendarOutlined } from "@ant-design/icons";
 import { Trip } from "@/types/trip";
 
 const { Title, Text } = Typography;
@@ -92,12 +92,6 @@ export default function TripLayout({ children }: { children: React.ReactNode }) 
                 </div>
               )}
             </div>
-            {trip?.adminUsername && (
-              <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#eff6ff", padding: "4px 12px", borderRadius: 20, border: "1px solid #bfdbfe" }}>
-                <TeamOutlined style={{ color: "#2563eb", fontSize: 13 }} />
-                <Text style={{ fontSize: 12, color: "#2563eb" }}>Admin: {trip.adminUsername}</Text>
-              </div>
-            )}
           </div>
         </Card>
 

@@ -65,3 +65,9 @@ a {
 .custom-notification * {
   color: #000 !important;
 }
+
+.task-status-dropdown .ant-select-item {
+  font-size: 12px;
+  min-height: 28px;
+  padding: 4px 8px;
+}
