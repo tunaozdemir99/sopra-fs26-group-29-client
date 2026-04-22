@@ -114,7 +114,7 @@ reason).
 |                    | 21.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/cb787f8ec9445762c7cebd3ce5dd3e289f19e3d1 | Add DELETE endpoint for removing pins (#70) | Enables pin cleanup with trip-ownership validation |
 |                    | 21.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/aef42ea169220998e9dcce6ef1c627001bdc3808 | Add Pin service and controller tests (#71 #68 #70) | 14 unit tests covering GET/POST/DELETE success and error paths for Pin |
 |                    | 21.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/d3fe491b8753688b8f2a39ebb8feb6a31bcad3c4 | Resolve DTOMapper conflict with develop | Keeps feature branch in sync with team's concurrent changes |
-|                    | 21.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/96a86b5d6b68c08a2efd4a6e7755e35f631aed02 | Integrate pin search, display, and delete on map page (#67 #69) | Complete frontend map integration - search locations, pin to trip, view markers + list, delete pins |
+|                    | 21.04.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/96a86b5d6b68c08a2efd4a6e7755e35f631aed02 | Integrate pin search, display, and delete on map page (client #44 #45) | Complete frontend map integration - search locations, pin to trip, view markers + list, delete pins |
 | **[@eoyelana]**    | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 
