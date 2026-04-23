@@ -11,4 +11,6 @@ export interface Activity {
   durationMinutes: number | null;
   travelTimeToNextActivity: number | null;
   gapToNextActivityMinutes: number | null;
+  hasOverlapConflict?: boolean | null;
+  hasTravelTimeConflict?: boolean | null;
 }
