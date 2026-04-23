@@ -199,6 +199,9 @@ const TimelinePage: React.FC = () => {
   );
 
   const hasOverlapWith = (cur: Activity, next: Activity): boolean => {
+    if (cur.hasOverlapConflict !== null && cur.hasOverlapConflict !== undefined) {
+      return cur.hasOverlapConflict;
+    }
     if (cur.gapToNextActivityMinutes !== null) return cur.gapToNextActivityMinutes < 0;
     return cur.date === next.date && toMinutes(cur.endTime) > toMinutes(next.startTime);
   };
@@ -235,9 +238,10 @@ const TimelinePage: React.FC = () => {
             const hasOverlap = overlapWithNext || overlapWithPrev;
 
             const gap = activity.gapToNextActivityMinutes;
-            const travel = travelTimes[activity.activityId] ?? activity.travelTimeToNextActivity ?? null;
+            const travel = activity.travelTimeToNextActivity ?? travelTimes[activity.activityId] ?? null;
             const freeTime = gap !== null && travel !== null ? gap - travel : null;
-            const hasTravelWarning = isSameDayAsNext && freeTime !== null && freeTime < 0 && gap !== null && gap >= 0;
+            const hasTravelWarning = isSameDayAsNext
+              && (activity.hasTravelTimeConflict ?? (freeTime !== null && freeTime < 0 && gap !== null && gap >= 0));
 
             const duration = formatDuration(activity.durationMinutes);
 
