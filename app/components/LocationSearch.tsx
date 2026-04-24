@@ -100,7 +100,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
         }}>
           {results.map((item) => (
             <button
-              key={item.display_name}
+              key={`${item.lat},${item.lon}`}
               type="button"
               style={{
                 display: "block",

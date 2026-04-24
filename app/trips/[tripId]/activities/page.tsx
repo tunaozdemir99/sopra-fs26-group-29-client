@@ -4,15 +4,15 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import {
-  Button, Card, DatePicker, Form, InputNumber, Modal, Empty,
-  message, Select, TimePicker, Typography, Input, Tag,
+  Alert, App, Button, Card, DatePicker, Form, InputNumber, Modal, Empty,
+  TimePicker, Typography, Input, Tag,
 } from "antd";
-import { DeleteOutlined, EditOutlined, PlusOutlined, EnvironmentOutlined, ClockCircleOutlined, BulbOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined, EnvironmentOutlined, ClockCircleOutlined, BulbOutlined, WarningOutlined, CloseCircleOutlined, ArrowRightOutlined, CarOutlined} from "@ant-design/icons";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import { Activity } from "@/types/activity";
-import { BucketItem } from "@/types/bucketItem";
 import LocationSearch, { SelectedLocation } from "@/components/LocationSearch";
+
 
 const { Title, Text } = Typography;
 
@@ -44,7 +44,6 @@ const TimelinePage: React.FC = () => {
   const { tripId } = useParams<{ tripId: string }>();
   const apiService = useApi();
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [bucketItems, setBucketItems] = useState<BucketItem[]>([]);
   const [travelTimes, setTravelTimes] = useState<Record<number, number>>({});
   const [modalOpen, setModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -53,18 +52,12 @@ const TimelinePage: React.FC = () => {
   const [editSubmitting, setEditSubmitting] = useState(false);
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
+  const { message } = App.useApp();
 
   const fetchActivities = useCallback(async () => {
     try {
       const data = await apiService.get<Activity[]>(`/trips/${tripId}/timeline`);
       setActivities(data);
-    } catch { /* ignore */ }
-  }, [apiService, tripId]);
-
-  const fetchBucketItems = useCallback(async () => {
-    try {
-      const data = await apiService.get<BucketItem[]>(`/trips/${tripId}/bucketItems`);
-      setBucketItems(data);
     } catch { /* ignore */ }
   }, [apiService, tripId]);
 
@@ -112,7 +105,7 @@ const TimelinePage: React.FC = () => {
   }, [activities]);
 
   const handleSubmit = async (values: {
-    bucketItemId: number;
+    name: string;
     date: Dayjs;
     startTime: Dayjs;
     endTime: Dayjs;
@@ -123,7 +116,7 @@ const TimelinePage: React.FC = () => {
     setSubmitting(true);
     try {
       await apiService.post<Activity>(`/trips/${tripId}/timeline`, {
-        bucketItemId: values.bucketItemId,
+        name: values.name,
         date: values.date.format("YYYY-MM-DD"),
         startTime: values.startTime.format("HH:mm:ss"),
         endTime: values.endTime.format("HH:mm:ss"),
@@ -218,13 +211,13 @@ const TimelinePage: React.FC = () => {
     <div style={{ padding: "16px 0" }}>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
         <Button type="primary" icon={<PlusOutlined />}
-          onClick={() => { fetchBucketItems(); setModalOpen(true); }}>
+          onClick={() => setModalOpen(true)}>
           Add Activity
         </Button>
       </div>
 
       {sorted.length === 0 ? (
-        <Empty description="No activities yet. Schedule one from your idea bucket!" />
+        <Empty description="No activities yet. Add one to get started!" />
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
           {sorted.map((activity, index) => {
@@ -241,7 +234,8 @@ const TimelinePage: React.FC = () => {
             const travel = activity.travelTimeToNextActivity ?? travelTimes[activity.activityId] ?? null;
             const freeTime = gap !== null && travel !== null ? gap - travel : null;
             const hasTravelWarning = isSameDayAsNext
-              && (activity.hasTravelTimeConflict ?? (freeTime !== null && freeTime < 0 && gap !== null && gap >= 0));
+              && (activity.hasTravelTimeConflict || (freeTime !== null && freeTime < 0 && gap !== null));
+
 
             const duration = formatDuration(activity.durationMinutes);
 
@@ -275,17 +269,12 @@ const TimelinePage: React.FC = () => {
                 >
                   <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "4px 12px" }}>
                     <Title level={5} style={{ margin: 0, color: "#111" }}>{activity.name}</Title>
-                    {duration && (
-                      <Tag icon={<ClockCircleOutlined />} color="blue" style={{ margin: 0 }}>
-                        {duration}
-                      </Tag>
-                    )}
                     {activity.fromBucketItem && (
                       <Tag icon={<BulbOutlined />} color="gold" style={{ margin: 0 }}>From Idea Bucket</Tag>
                     )}
                   </div>
                   <Text type="secondary" style={{ display: "block", marginTop: 4 }}>
-                    {activity.startTime.slice(0, 5)}–{activity.endTime.slice(0, 5)}
+                    <ClockCircleOutlined /> {activity.startTime.slice(0, 5)} – {activity.endTime.slice(0, 5)}{duration ? ` (${duration})` : ""}
                   </Text>
                   {activity.locationName && (
                     <div style={{ marginTop: 2 }}>
@@ -293,48 +282,43 @@ const TimelinePage: React.FC = () => {
                     </div>
                   )}
                   {hasOverlap && (
-                    <div style={{ marginTop: 4 }}>
-                      <Text type="danger">Time overlap conflict with adjacent activity.</Text>
-                    </div>
+                    <Alert
+                      type="error"
+                      showIcon
+                      icon={<CloseCircleOutlined />}
+                      style={{ marginTop: 8 }}
+                      title={<span style={{ color: "#dc2626" }}>Time overlap conflict with adjacent activity.</span>}
+                    />
                   )}
-                  {hasTravelWarning && (
-                    <div style={{ marginTop: 4 }}>
-                      <Text type="warning">Not enough time to travel to the next activity.</Text>
-                    </div>
+                  {hasTravelWarning && next && travel !== null && freeTime !== null && (
+                    <Alert
+                      type="warning"
+                      showIcon
+                      icon={<WarningOutlined />}
+                      style={{ marginTop: 8 }}
+                      title={<span style={{ color: "#d97706" }}>{`Insufficient time to travel to "${next.name}". Need ${travel} min, have ${gap} min.`}</span>}
+                    />
                   )}
                 </Card>
-
-                {isSameDayAsNext && (
-                  <div style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    margin: "6px 0",
-                    fontSize: 12,
-                  }}>
-                    <div style={{ flex: 1, height: 1, background: "#e5e7eb" }} />
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, whiteSpace: "nowrap" }}>
-                      {gap !== null && gap < 0 ? (
-                        <Text type="danger" style={{ fontSize: 12 }}>⚠ overlap</Text>
-                      ) : gap !== null ? (
-                        <Text type="secondary" style={{ fontSize: 12 }}>{gap} min gap</Text>
-                      ) : null}
-                      {travel !== null ? (
-                        <Text style={{ fontSize: 12, color: freeTime !== null && freeTime < 0 ? "#faad14" : "#6b7280" }}>
-                          {travel} min drive
-                          {freeTime !== null && (
-                            <span style={{ marginLeft: 4 }}>
-                              · {freeTime >= 0 ? `${freeTime} min free` : `${Math.abs(freeTime)} min short`}
-                            </span>
-                          )}
-                        </Text>
-                      ) : (
-                        <Text style={{ fontSize: 11, color: "#d1d5db" }}> add a location to see travel time</Text>
-                      )}
+                  {isSameDayAsNext && (
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, margin: "4px 0" }}>
+                      <span style={{
+                        display: "inline-flex", alignItems: "center", gap: 5,
+                        border: "1px solid #d1d5db", borderRadius: 6,
+                        padding: "2px 8px",
+                      }}>
+                        <CarOutlined style={{ color: "#9ca3af", fontSize: 11 }} />
+                        <ArrowRightOutlined style={{ color: "#d1d5db", fontSize: 10 }} />
+                        {travel !== null ? (
+                          <span style={{ fontSize: 13, color: "#6b7280" }}><strong>{travel} min</strong> travel time</span>
+                        ) : (
+                          <span style={{ fontSize: 11, color: "#d1d5db" }}>add a location to see travel time</span>
+                        )}
+                      </span>
                     </div>
-                    <div style={{ flex: 1, height: 1, background: "#e5e7eb" }} />
-                  </div>
-                )}
+                  )}
+
+
               </React.Fragment>
             );
           })}
@@ -343,11 +327,10 @@ const TimelinePage: React.FC = () => {
 
       {/* Add Activity Modal */}
       <Modal title="Schedule Activity" open={modalOpen}
-        onCancel={() => { setModalOpen(false); form.resetFields(); }} footer={null} destroyOnHidden>
+        onCancel={() => { setModalOpen(false); form.resetFields(); }} footer={null}>
         <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ marginTop: 16 }}>
-          <Form.Item name="bucketItemId" label="Idea from bucket" rules={[{ required: true, message: "Please select an idea" }]}>
-            <Select placeholder="Select from your idea bucket"
-              options={bucketItems.map((b) => ({ label: b.name, value: b.bucketItemId }))} />
+          <Form.Item name="name" label="Activity Name" rules={[{ required: true, message: "Please enter a name" }]}>
+            <Input placeholder="e.g. Hiking at Uetliberg" />
           </Form.Item>
           <Form.Item name="date" label="Date" rules={[{ required: true, message: "Date is required" }]}>
             <DatePicker style={{ width: "100%" }} />
@@ -358,13 +341,15 @@ const TimelinePage: React.FC = () => {
           <Form.Item name="endTime" label="End Time" rules={[{ required: true, message: "End time is required" }]}>
             <TimePicker format="HH:mm" style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item label="Location">
+          <Form.Item label="Location" required>
             <LocationSearch
               placeholder="Search for a location..."
               onSelect={(loc) => handleLocationSelect(loc, form)}
             />
           </Form.Item>
-          <Form.Item name="locationName" noStyle><Input type="hidden" /></Form.Item>
+          <Form.Item name="locationName" rules={[{ required: true, message: "Please select a location" }]}>
+            <Input type="hidden" />
+          </Form.Item>
           <Form.Item name="latitude" noStyle><InputNumber style={{ display: "none" }} /></Form.Item>
           <Form.Item name="longitude" noStyle><InputNumber style={{ display: "none" }} /></Form.Item>
           <Form.Item>
@@ -376,7 +361,7 @@ const TimelinePage: React.FC = () => {
       {/* Edit Activity Modal */}
       <Modal title="Edit Activity" open={editModalOpen}
         onCancel={() => { setEditModalOpen(false); setEditingActivity(null); editForm.resetFields(); }}
-        footer={null} destroyOnHidden>
+        footer={null}>
         <Form form={editForm} layout="vertical" onFinish={handleEditSubmit} style={{ marginTop: 16 }}>
           <Form.Item name="date" label="Date" rules={[{ required: true, message: "Date is required" }]}>
             <DatePicker style={{ width: "100%" }} />

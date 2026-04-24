@@ -4,7 +4,7 @@ import React, { useEffect, useCallback, useState } from "react";
 import { useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { Button, Form, Input, Modal, message, Typography, Select, Avatar } from "antd";
+import { App, Button, Form, Input, Modal, Typography, Select, Avatar } from "antd";
 import { PlusOutlined, DeleteOutlined, CheckCircleOutlined, ClockCircleOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { Task, TaskStatus } from "@/types/task";
 
@@ -25,6 +25,7 @@ const TasksPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
+  const { message } = App.useApp(); 
 
   const fetchTasks = useCallback(async () => {
     try {
