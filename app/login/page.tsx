@@ -30,12 +30,8 @@ const Login: React.FC = () => {
       }
       setUserId(String(response.id));
       router.push(`/users/${response.id}/trips`);
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
+      } catch {
         setError("Invalid username or password.");
-      }
       form.resetFields();
     }
   };
@@ -54,7 +50,7 @@ const Login: React.FC = () => {
 
         {error && (
           <Alert
-            message="Error"
+            title="Error"
             description={error}
             type="error"
             showIcon
