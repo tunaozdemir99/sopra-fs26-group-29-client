@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -50,30 +50,45 @@ interface TripMapProps {
 }
 
 const TripMap: React.FC<TripMapProps> = ({ markers, onMapClick, height = 400 }) => {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    return () => {
+      // React 18 strict-mode double-mounts components; clear Leaflet's container
+      // ID on unmount so the second mount can initialise a fresh map instance.
+      if (wrapperRef.current) {
+        const el = wrapperRef.current.querySelector(".leaflet-container") as HTMLElement & { _leaflet_id?: number };
+        if (el) delete el._leaflet_id;
+      }
+    };
+  }, []);
+
   const defaultCenter: [number, number] = markers.length > 0
     ? [markers[0].lat, markers[0].lng]
     : [48.8566, 2.3522]; // Paris as fallback
 
   return (
-    <MapContainer
-      center={defaultCenter}
-      zoom={markers.length === 0 ? 4 : 12}
-      style={{ height, width: "100%", borderRadius: 8, zIndex: 0 }}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+    <div ref={wrapperRef}>
+      <MapContainer
+        center={defaultCenter}
+        zoom={markers.length === 0 ? 4 : 12}
+        style={{ height, width: "100%", borderRadius: 8, zIndex: 0 }}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
 
-      {markers.length > 0 && <FitBounds markers={markers} />}
-      {onMapClick && <ClickHandler onMapClick={onMapClick} />}
+        {markers.length > 0 && <FitBounds markers={markers} />}
+        {onMapClick && <ClickHandler onMapClick={onMapClick} />}
 
-      {markers.map((m, i) => (
-        <Marker key={i} position={[m.lat, m.lng]}>
-          <Popup>{m.label}</Popup>
-        </Marker>
-      ))}
-    </MapContainer>
+        {markers.map((m) => (
+          <Marker key={`${m.lat}-${m.lng}-${m.label}`} position={[m.lat, m.lng]}>
+            <Popup>{m.label}</Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+    </div>
   );
 };
 
