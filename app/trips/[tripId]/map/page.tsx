@@ -4,8 +4,9 @@ import React, { useEffect, useCallback, useState } from "react";
 import { useParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useApi } from "@/hooks/useApi";
-import { Button, Card, Empty, Typography, List, Popconfirm, message } from "antd";
-import { EnvironmentOutlined, DeleteOutlined, PushpinOutlined } from "@ant-design/icons";
+import { App, Button, Card, DatePicker, Empty, Form, Input, Modal, Popconfirm, TimePicker, Typography } from "antd";
+import { CalendarOutlined, DeleteOutlined, EnvironmentOutlined, PushpinOutlined } from "@ant-design/icons";
+import type { Dayjs } from "dayjs";
 import LocationSearch, { SelectedLocation } from "@/components/LocationSearch";
 import type { MapMarker } from "@/components/TripMap";
 
@@ -23,9 +24,13 @@ interface Pin {
 const MapPage: React.FC = () => {
   const { tripId } = useParams<{ tripId: string }>();
   const apiService = useApi();
+  const { message } = App.useApp();
   const [pins, setPins] = useState<Pin[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<SelectedLocation | null>(null);
   const [pinning, setPinning] = useState(false);
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const [scheduling, setScheduling] = useState(false);
+  const [scheduleForm] = Form.useForm();
 
   const fetchPins = useCallback(async () => {
     try {
@@ -60,6 +65,29 @@ const MapPage: React.FC = () => {
     }
   };
 
+  const handleScheduleFromMap = async (values: { name: string; date: Dayjs; startTime: Dayjs; endTime: Dayjs }) => {
+    if (!selectedLocation) return;
+    setScheduling(true);
+    try {
+      await apiService.post(`/trips/${tripId}/timeline`, {
+        name: values.name,
+        date: values.date.format("YYYY-MM-DD"),
+        startTime: values.startTime.format("HH:mm:ss"),
+        endTime: values.endTime.format("HH:mm:ss"),
+        locationName: selectedLocation.label.split(",")[0].trim(),
+        latitude: selectedLocation.lat,
+        longitude: selectedLocation.lng,
+      });
+      message.success("Activity added to timeline!");
+      setScheduleModalOpen(false);
+      scheduleForm.resetFields();
+    } catch (e) {
+      message.error((e as Error).message ?? "Failed to add activity");
+    } finally {
+      setScheduling(false);
+    }
+  };
+
   const handleDelete = async (pinId: number) => {
     try {
       await apiService.delete(`/trips/${tripId}/pins/${pinId}`);
@@ -71,11 +99,10 @@ const MapPage: React.FC = () => {
     }
   };
 
-  const markers: MapMarker[] = pins.map((p) => ({
-    lat: p.latitude,
-    lng: p.longitude,
-    label: p.name,
-  }));
+  const markers: MapMarker[] = [
+    ...pins.map((p) => ({ lat: p.latitude, lng: p.longitude, label: p.name })),
+    ...(selectedLocation ? [{ lat: selectedLocation.lat, lng: selectedLocation.lng, label: selectedLocation.label.split(",")[0].trim() }] : []),
+  ];
 
   return (
     <div style={{ padding: "16px 0" }}>
@@ -100,6 +127,17 @@ const MapPage: React.FC = () => {
           >
             Pin to Trip
           </Button>
+          <Button
+            icon={<CalendarOutlined />}
+            onClick={() => {
+              if (!selectedLocation) return;
+              scheduleForm.setFieldsValue({ name: selectedLocation.label.split(",")[0].trim() });
+              setScheduleModalOpen(true);
+            }}
+            disabled={!selectedLocation}
+          >
+            Add to Timeline
+          </Button>
         </div>
       </Card>
 
@@ -114,37 +152,70 @@ const MapPage: React.FC = () => {
         {pins.length === 0 ? (
           <Empty description="No pinned locations yet. Search and pin places above!" />
         ) : (
-          <List
-            size="small"
-            dataSource={pins}
-            renderItem={(pin) => (
-              <List.Item
-                actions={[
-                  <Popconfirm
-                    key="delete"
-                    title="Remove this pin?"
-                    onConfirm={() => handleDelete(pin.pinId)}
-                    okText="Yes"
-                    cancelText="No"
-                  >
-                    <Button size="small" danger icon={<DeleteOutlined />}>
-                      Remove
-                    </Button>
-                  </Popconfirm>,
-                ]}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {pins.map((pin) => (
+              <div
+                key={pin.pinId}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "6px 0",
+                  borderBottom: "1px solid #f0f0f0",
+                }}
               >
-                <Text>
-                  <EnvironmentOutlined style={{ marginRight: 8 }} />
-                  {pin.name}
-                </Text>
-                <Text type="secondary" style={{ marginLeft: 8, fontSize: 12 }}>
-                  ({pin.latitude.toFixed(4)}, {pin.longitude.toFixed(4)})
-                </Text>
-              </List.Item>
-            )}
-          />
+                <div>
+                  <Text>
+                    <EnvironmentOutlined style={{ marginRight: 8 }} />
+                    {pin.name}
+                  </Text>
+                  <Text type="secondary" style={{ marginLeft: 8, fontSize: 12 }}>
+                    ({pin.latitude.toFixed(4)}, {pin.longitude.toFixed(4)})
+                  </Text>
+                </div>
+                <Popconfirm
+                  title="Remove this pin?"
+                  onConfirm={() => handleDelete(pin.pinId)}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Button size="small" danger icon={<DeleteOutlined />}>
+                    Remove
+                  </Button>
+                </Popconfirm>
+              </div>
+            ))}
+          </div>
         )}
       </Card>
+
+      <Modal
+        title="Add to Timeline"
+        open={scheduleModalOpen}
+        onCancel={() => { setScheduleModalOpen(false); scheduleForm.resetFields(); }}
+        footer={null}
+        destroyOnHidden
+      >
+        <Form form={scheduleForm} layout="vertical" onFinish={handleScheduleFromMap} style={{ marginTop: 16 }}>
+          <Form.Item name="name" label="Activity Name" rules={[{ required: true, message: "Name is required" }]}>
+            <Input placeholder="e.g. Visit the lake" />
+          </Form.Item>
+          <Form.Item name="date" label="Date" rules={[{ required: true, message: "Date is required" }]}>
+            <DatePicker style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item name="startTime" label="Start Time" rules={[{ required: true, message: "Start time is required" }]}>
+            <TimePicker format="HH:mm" style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item name="endTime" label="End Time" rules={[{ required: true, message: "End time is required" }]}>
+            <TimePicker format="HH:mm" style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={scheduling} block>
+              Add to Timeline
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

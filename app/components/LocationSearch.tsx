@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Input, List, Spin, Typography } from "antd";
+import { Input, Spin, Typography } from "antd";
 import { EnvironmentOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
@@ -98,20 +98,26 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
           maxHeight: 200,
           overflowY: "auto",
         }}>
-          <List
-            size="small"
-            dataSource={results}
-            renderItem={(item) => (
-              <List.Item
-                style={{ cursor: "pointer", padding: "8px 12px" }}
-                onClick={() => handleSelect(item)}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#eff6ff")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-              >
-                <Text style={{ fontSize: 13, color: "#111" }}>{item.display_name}</Text>
-              </List.Item>
-            )}
-          />
+          {results.map((item) => (
+            <button
+              key={item.display_name}
+              type="button"
+              style={{
+                display: "block",
+                width: "100%",
+                textAlign: "left",
+                cursor: "pointer",
+                padding: "8px 12px",
+                background: "transparent",
+                border: "none",
+              }}
+              onClick={() => handleSelect(item)}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#eff6ff")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+            >
+              <Text style={{ fontSize: 13, color: "#111" }}>{item.display_name}</Text>
+            </button>
+          ))}
         </div>
       )}
 
