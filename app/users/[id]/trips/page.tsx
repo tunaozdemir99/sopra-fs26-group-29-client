@@ -122,9 +122,14 @@ const UserTripsDashboard: React.FC = () => {
             <Title level={2} style={{ margin: 0, color: "#111" }}>My Trips</Title>
             <Text style={{ color: "#666" }}>Plan and manage your adventures</Text>
           </div>
-          <Button icon={<LogoutOutlined />} onClick={handleLogout}>
-            Logout
-          </Button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <Button onClick={() => router.push(`/users/${id}`)}>
+              My Profile
+            </Button>
+            <Button icon={<LogoutOutlined />} onClick={handleLogout}>
+              Logout
+            </Button>
+          </div>
         </div>
 
         {/* Action buttons */}

@@ -43,6 +43,7 @@ const Dashboard: React.FC = () => {
     // set: setToken, // is commented out because we dont need to set or update the token value
     clear: clearToken, // all we need in this scenario is a method to clear the token
   } = useLocalStorage<string>("token", ""); // if you wanted to select a different token, i.e "lobby", useLocalStorage<string>("lobby", "");
+  const { value: userId } = useLocalStorage<string>("userId", "");
 
   const handleLogout = (): void => {
     // Clear token using the returned function 'clear' from the hook
@@ -92,6 +93,9 @@ const Dashboard: React.FC = () => {
                 style: { cursor: "pointer" },
               })}
             />
+            <Button onClick={() => router.push(`/users/${userId}`)} style={{ marginRight: 8 }}>
+              My Profile
+            </Button>
             <Button onClick={handleLogout} type="primary">
               Logout
             </Button>
