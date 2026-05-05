@@ -9,4 +9,5 @@ export interface BucketItem {
   addedBy: { id: number; username: string };
   voteScore: number;
   myVote: number;
+  createdAt: string;
 }
