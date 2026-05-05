@@ -78,6 +78,7 @@ const Profile: React.FC = () => {
       await apiService.patch(`/users/${params.id}`, { password: values.password });
       passwordForm.resetFields();
       setIsChangingPassword(false);
+      router.push(`/users/${params.id}`); 
     } catch (error) {
       if (error instanceof Error) alert(error.message);
     }
@@ -98,9 +99,12 @@ const Profile: React.FC = () => {
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
           <Title level={2} style={{ margin: 0 }}>My Profile</Title>
-          {isOwnProfile && (
-            <Button danger onClick={handleLogout}>Logout</Button>
-          )}
+          <div style={{ display: "flex", gap: 8 }}>
+            <Button onClick={() => router.push(`/users/${userId}/trips`)}>Dashboard</Button>
+            {isOwnProfile && (
+              <Button danger onClick={handleLogout}>Logout</Button>
+            )}
+          </div>
         </div>
 
         {user && (
