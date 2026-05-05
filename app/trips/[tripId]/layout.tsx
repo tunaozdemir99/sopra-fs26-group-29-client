@@ -4,17 +4,18 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter, usePathname } from "next/navigation";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useApi } from "@/hooks/useApi";
-import { Button, Card, Tabs, Typography, Spin, message, Tooltip } from "antd";
+import { App, Button, Card, Tabs, Typography, Spin, Tooltip } from "antd";
 import { ArrowLeftOutlined, CalendarOutlined, TeamOutlined, ShareAltOutlined } from "@ant-design/icons";
 import { Trip } from "@/types/trip";
 
 const { Title, Text } = Typography;
 
-export default function TripLayout({ children }: { children: React.ReactNode }) {
+function TripLayoutInner({ children }: { children: React.ReactNode }) {
   const { tripId } = useParams<{ tripId: string }>();
   const router = useRouter();
   const pathname = usePathname();
   const apiService = useApi();
+  const { message } = App.useApp();
   const { value: token } = useLocalStorage<string>("token", "");
   const { value: userId } = useLocalStorage<string>("userId", "");
   const [trip, setTrip] = useState<Trip | null>(null);
@@ -123,4 +124,8 @@ export default function TripLayout({ children }: { children: React.ReactNode }) 
       </div>
     </div>
   );
+}
+
+export default function TripLayout({ children }: { children: React.ReactNode }) {
+  return <App><TripLayoutInner>{children}</TripLayoutInner></App>;
 }

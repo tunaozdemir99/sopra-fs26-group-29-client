@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { App, Button, Card, DatePicker, Form, Input, Modal, Empty, TimePicker, Typography, Popconfirm } from "antd";
+import { App, Button, Card, DatePicker, Form, Input, Modal, Empty, Select, TimePicker, Typography, Popconfirm } from "antd";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import { BulbOutlined, DeleteOutlined, EditOutlined, EnvironmentOutlined, CalendarOutlined, LikeOutlined, DislikeOutlined } from "@ant-design/icons";
@@ -31,6 +31,7 @@ const IdeaBucketPage: React.FC = () => {
   const [scheduleForm] = Form.useForm();
   const locationRef = useRef<SelectedLocation | null>(null);
   const editLocationRef = useRef<SelectedLocation | null>(null);
+  const [sortOrder, setSortOrder] = useState<"votes" | "recency">("recency");
 
   const fetchItems = useCallback(async () => {
     try {
@@ -132,11 +133,27 @@ const IdeaBucketPage: React.FC = () => {
         </Button>
       </div>
 
+      <div style={{ marginBottom: 16 }}>
+        <Select
+          value={sortOrder}
+          onChange={(val) => setSortOrder(val)}
+          style={{ width: 160 }}
+          options={[
+            { value: "votes", label: "Sort by Votes" },
+            { value: "recency", label: "Sort by Recent" },
+          ]}
+        />
+      </div>
+
       {items.length === 0 ? (
         <Empty description="No ideas yet. Be the first to add one!" />
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
-          {items.map((item) => (
+          {[...items].sort((a, b) =>
+            sortOrder === "votes"
+              ? b.voteScore - a.voteScore
+              : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          ).map((item) => (
             <Card
               key={item.bucketItemId}
               style={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
