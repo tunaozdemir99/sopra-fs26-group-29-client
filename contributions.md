@@ -125,9 +125,14 @@ reason).
 
 ---
 
-## Contributions Week 4 - [Begin Date] to [End Date]
+## Contributions Week 4 - 29.04.2026 to 05.05.2026
 
-_Continue with the same table format as above._
+| **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
+| ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| **[@tunaozdemir99]** | 05.05.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/5abaeab7bedbd4efe08e1a7a28918e323daf4d1d | Added a database constraint so that the database itself blocks a user from voting more than once on the same idea from the idea bucket. | Keeps vote counts fair and accurate for all trip ideas in the bucket, which is an essential feature of our product. |
+|                    | 05.05.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/fdb16ad2c92d385bde58d83abe490516c229881f | Added a creation time field to bucket items on the backend. | This implementation was needed so the app can sort ideas by how recently they were added. |
+|                    | 05.05.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/a01e179e3d67487ae356dd85e282da72db09c913 | Added tests to check that duplicate bucket item votes are blocked and bucket item timestamps work correctly. | Verifies that the two features added in the previous commits work as intended. |
+|                    | 05.05.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/6850bdfbfbbc30b8b2a306e3b8163530cfd157cc | Added a dropdown menu to the Idea Bucket tab so users can sort ideas by votes or by how new they are, and fixed a minor UI warning. | This allows users a way to find the most popular or most recent trip ideas easily, completing the implementation of user story 9. |
 
 ---
 
