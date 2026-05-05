@@ -5,7 +5,7 @@ import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 import { Alert, Button, Card, Form, Input, Typography } from "antd";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const { Title, Text } = Typography;
 
@@ -19,8 +19,14 @@ const Login: React.FC = () => {
   const apiService = useApi();
   const [form] = Form.useForm();
   const [error, setError] = useState<string | null>(null);
+  const [returnTo, setReturnTo] = useState<string | null>(null);
   const { set: setToken } = useLocalStorage<string>("token", "");
   const { set: setUserId } = useLocalStorage<string>("userId", "");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setReturnTo(params.get("returnTo"));
+  }, []);
 
   const handleLogin = async (values: FormFieldProps) => {
     try {
@@ -29,9 +35,13 @@ const Login: React.FC = () => {
         setToken(response.token);
       }
       setUserId(String(response.id));
-      router.push(`/users/${response.id}/trips`);
-      } catch {
+      router.push(returnTo ?? `/users/${response.id}/trips`);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
         setError("Invalid username or password.");
+      }
       form.resetFields();
     }
   };

@@ -72,14 +72,20 @@ const UserTripsDashboard: React.FC = () => {
     }
   };
 
-  const handleJoinTrip = async (values: { inviteLink: string }) => {
+  const handleJoinTrip = async (values: { inviteCode: string }) => {
     setSubmitting(true);
     try {
-      const joined = await apiService.post<Trip>("/trips/join", { inviteLink: values.inviteLink });
+      const codeMatch = values.inviteCode.match(/\/invite\/([a-f0-9-]+)/i);
+      const inviteCode = codeMatch ? codeMatch[1] : values.inviteCode.trim();
+      const result = await apiService.post<{ tripId: number; alreadyMember: boolean; message: string }>("/trips/join", { inviteCode });
       joinForm.resetFields();
       setJoinModalOpen(false);
-      message.success("Joined trip successfully!");
-      router.push(`/trips/${joined.tripId}`);
+      if (result.alreadyMember) {
+        message.info(result.message ?? "You are already a member of this trip.");
+      } else {
+        message.success("Joined trip successfully!");
+      }
+      router.push(`/trips/${result.tripId}`);
     } catch (error) {
       const e = error as Error;
       message.error(e.message ?? "Failed to join trip. Please check the invite link.");
@@ -265,11 +271,11 @@ const UserTripsDashboard: React.FC = () => {
       >
         <Form form={joinForm} layout="vertical" onFinish={handleJoinTrip} style={{ marginTop: 16 }}>
           <Form.Item
-            name="inviteLink"
-            label="Invite Link"
-            rules={[{ required: true, message: "Please paste an invite link" }]}
+            name="inviteCode"
+            label="Invite Link or Code"
+            rules={[{ required: true, message: "Please paste an invite link or code" }]}
           >
-            <Input placeholder="Paste invite link here" size="large" />
+            <Input placeholder="Paste invite link or code here" size="large" />
           </Form.Item>
           <Form.Item style={{ marginBottom: 0 }}>
             <Button

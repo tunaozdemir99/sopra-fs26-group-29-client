@@ -4,8 +4,8 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter, usePathname } from "next/navigation";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useApi } from "@/hooks/useApi";
-import { Button, Card, Tabs, Typography, Spin } from "antd";
-import { ArrowLeftOutlined, CalendarOutlined } from "@ant-design/icons";
+import { Button, Card, Tabs, Typography, Spin, message, Tooltip } from "antd";
+import { ArrowLeftOutlined, CalendarOutlined, TeamOutlined, ShareAltOutlined } from "@ant-design/icons";
 import { Trip } from "@/types/trip";
 
 const { Title, Text } = Typography;
@@ -36,6 +36,13 @@ export default function TripLayout({ children }: { children: React.ReactNode }) 
 
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+  const handleCopyInvite = () => {
+    if (trip?.inviteUrl) {
+      const url = `${window.location.origin}/invite/${trip.inviteUrl}`;
+      navigator.clipboard.writeText(url).then(() => message.success("Invite link copied!"));
+    }
+  };
 
   const activeKey = pathname.endsWith("/ideaBucket") ? "ideaBucket"
     : pathname.endsWith("/activities") ? "activities"
@@ -90,6 +97,21 @@ export default function TripLayout({ children }: { children: React.ReactNode }) 
                 <div style={{ marginTop: 4 }}>
                   <Text style={{ fontSize: 13, color: "#555" }}>📍 {trip.location}</Text>
                 </div>
+              )}
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+              {trip?.adminUsername && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#eff6ff", padding: "4px 12px", borderRadius: 20, border: "1px solid #bfdbfe" }}>
+                  <TeamOutlined style={{ color: "#2563eb", fontSize: 13 }} />
+                  <Text style={{ fontSize: 12, color: "#2563eb" }}>Admin: {trip.adminUsername}</Text>
+                </div>
+              )}
+              {trip?.inviteUrl && (
+                <Tooltip title="Copy invite link to share with others">
+                  <Button icon={<ShareAltOutlined />} size="small" onClick={handleCopyInvite}>
+                    Share Trip
+                  </Button>
+                </Tooltip>
               )}
             </div>
           </div>
