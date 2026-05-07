@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import { BulbOutlined, DeleteOutlined, EditOutlined, EnvironmentOutlined, CalendarOutlined, LikeOutlined, DislikeOutlined } from "@ant-design/icons";
 import { BucketItem } from "@/types/bucketItem";
+import { Trip } from "@/types/trip";
 import type { SelectedLocation } from "@/components/LocationSearch";
 
 const LocationSearch = dynamic(() => import("@/components/LocationSearch"), { ssr: false });
@@ -32,6 +33,7 @@ const IdeaBucketPage: React.FC = () => {
   const locationRef = useRef<SelectedLocation | null>(null);
   const editLocationRef = useRef<SelectedLocation | null>(null);
   const [sortOrder, setSortOrder] = useState<"votes" | "recency">("recency");
+  const [tripStartDate, setTripStartDate] = useState<string | null>(null);
 
   const fetchItems = useCallback(async () => {
     try {
@@ -45,6 +47,12 @@ const IdeaBucketPage: React.FC = () => {
     const interval = setInterval(fetchItems, 5000);
     return () => clearInterval(interval);
   }, [fetchItems]);
+
+  useEffect(() => {
+    apiService.get<Trip>(`/trips/${tripId}`).then((data) => {
+      setTripStartDate(data.startDate);
+    }).catch(() => {});
+  }, [apiService, tripId]);
 
   const handleAdd = async (values: { name: string; location?: string; description?: string }) => {
     setSubmitting(true);
@@ -259,7 +267,11 @@ const IdeaBucketPage: React.FC = () => {
       >
         <Form form={scheduleForm} layout="vertical" onFinish={handleSchedule} style={{ marginTop: 16 }}>
           <Form.Item name="date" label="Date" rules={[{ required: true, message: "Date is required" }]}>
-            <DatePicker style={{ width: "100%" }} disabledDate={(d) => d.isBefore(dayjs().startOf("day"))} />
+            <DatePicker
+              style={{ width: "100%" }}
+              disabledDate={(d) => d.isBefore(dayjs().startOf("day"))}
+              defaultPickerValue={tripStartDate ? dayjs(tripStartDate) : undefined}
+            />
           </Form.Item>
           <Form.Item name="startTime" label="Start Time" rules={[{ required: true, message: "Start time is required" }]}>
             <TimePicker style={{ width: "100%" }} format="HH:mm" minuteStep={15} />
