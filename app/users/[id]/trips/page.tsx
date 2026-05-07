@@ -7,7 +7,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { Trip } from "@/types/trip";
 import { App, Button, Card, Empty, Modal, Form, Input, DatePicker, Typography } from "antd";
 import { PlusOutlined, LogoutOutlined, QuestionCircleOutlined, CalendarOutlined } from "@ant-design/icons";
-import type { Dayjs } from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 
 const { Title, Text } = Typography;
 
@@ -246,12 +246,13 @@ const UserTripsDashboard: React.FC = () => {
             label="Dates"
             rules={[{ required: true, message: "Start and end date are required" }]}
           >
-            <DatePicker.RangePicker
-              style={{ width: "100%" }}
-              size="large"
-              placeholder={["Start Date", "End Date"]}
-              format="DD.MM.YYYY"
-            />
+          <DatePicker.RangePicker
+            style={{ width: "100%" }}
+            size="large"
+            placeholder={["Start Date", "End Date"]}
+            format="DD.MM.YYYY"
+            disabledDate={(current) => current && current.isBefore(dayjs().startOf("day"))}
+          />
           </Form.Item>
           <Form.Item style={{ marginBottom: 0 }}>
             <Button
