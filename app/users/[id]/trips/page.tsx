@@ -5,13 +5,14 @@ import { useParams, useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Trip } from "@/types/trip";
-import { Button, Card, Empty, Modal, Form, Input, DatePicker, Typography, message } from "antd";
+import { App, Button, Card, Empty, Modal, Form, Input, DatePicker, Typography } from "antd";
 import { PlusOutlined, LogoutOutlined, QuestionCircleOutlined, CalendarOutlined } from "@ant-design/icons";
 import type { Dayjs } from "dayjs";
 
 const { Title, Text } = Typography;
 
 const UserTripsDashboard: React.FC = () => {
+  const { message } = App.useApp();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const apiService = useApi();
@@ -30,19 +31,29 @@ const UserTripsDashboard: React.FC = () => {
   useEffect(() => {
     if (!token) {
       router.push("/login");
+      return;
     }
-  }, [token, router]);
+    if (id && userId && id !== userId) {
+      router.push(`/users/${userId}/trips`);
+    }
+  }, [token, userId, id, router]);
+
 
   const fetchTrips = useCallback(async () => {
     try {
       const data = await apiService.get<Trip[]>(`/users/${id}/trips`);
       setTrips(data);
-    } catch {
-      // ignore poll errors
+    } catch (error) {
+      const e = error as { status?: number };
+      if (e?.status === 403) {
+        router.push(`/users/${userId}/trips`);
+      } else {
+        message.error("Failed to load trips. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
-  }, [apiService, id]);
+  }, [apiService, id, userId, router, message]);
 
   useEffect(() => {
     fetchTrips();
