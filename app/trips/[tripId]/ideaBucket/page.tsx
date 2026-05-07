@@ -34,6 +34,7 @@ const IdeaBucketPage: React.FC = () => {
   const editLocationRef = useRef<SelectedLocation | null>(null);
   const [sortOrder, setSortOrder] = useState<"votes" | "recency">("recency");
   const [tripStartDate, setTripStartDate] = useState<string | null>(null);
+  const [tripEndDate, setTripEndDate] = useState<string | null>(null);
 
   const fetchItems = useCallback(async () => {
     try {
@@ -51,6 +52,7 @@ const IdeaBucketPage: React.FC = () => {
   useEffect(() => {
     apiService.get<Trip>(`/trips/${tripId}`).then((data) => {
       setTripStartDate(data.startDate);
+      setTripEndDate(data.endDate);
     }).catch(() => {});
   }, [apiService, tripId]);
 
@@ -267,11 +269,14 @@ const IdeaBucketPage: React.FC = () => {
       >
         <Form form={scheduleForm} layout="vertical" onFinish={handleSchedule} style={{ marginTop: 16 }}>
           <Form.Item name="date" label="Date" rules={[{ required: true, message: "Date is required" }]}>
-            <DatePicker
-              style={{ width: "100%" }}
-              disabledDate={(d) => d.isBefore(dayjs().startOf("day"))}
-              defaultPickerValue={tripStartDate ? dayjs(tripStartDate) : undefined}
-            />
+          <DatePicker
+            style={{ width: "100%" }}
+            defaultPickerValue={tripStartDate ? dayjs(tripStartDate) : undefined}
+            disabledDate={(d) =>
+              (tripStartDate ? d.isBefore(dayjs(tripStartDate), "day") : false) ||
+              (tripEndDate ? d.isAfter(dayjs(tripEndDate), "day") : false)
+            }
+          />
           </Form.Item>
           <Form.Item name="startTime" label="Start Time" rules={[{ required: true, message: "Start time is required" }]}>
             <TimePicker style={{ width: "100%" }} format="HH:mm" minuteStep={15} />
