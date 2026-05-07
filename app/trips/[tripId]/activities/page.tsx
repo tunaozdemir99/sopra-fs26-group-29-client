@@ -144,6 +144,7 @@ const TimelinePage: React.FC = () => {
     setEditingActivity(activity);
     editForm.resetFields();
     editForm.setFieldsValue({
+      name: activity.name,
       date: dayjs(activity.date),
       startTime: dayjs(activity.startTime, "HH:mm:ss"),
       endTime: dayjs(activity.endTime, "HH:mm:ss"),
@@ -155,6 +156,7 @@ const TimelinePage: React.FC = () => {
   };
 
   const handleEditSubmit = async (values: {
+    name: string;
     date: Dayjs;
     startTime: Dayjs;
     endTime: Dayjs;
@@ -166,6 +168,7 @@ const TimelinePage: React.FC = () => {
     setEditSubmitting(true);
     try {
       await apiService.put<Activity>(`/trips/${tripId}/timeline/${editingActivity.activityId}`, {
+        name: values.name,
         date: values.date.format("YYYY-MM-DD"),
         startTime: values.startTime.format("HH:mm:ss"),
         endTime: values.endTime.format("HH:mm:ss"),
@@ -363,6 +366,9 @@ const TimelinePage: React.FC = () => {
         onCancel={() => { setEditModalOpen(false); setEditingActivity(null); editForm.resetFields(); }}
         footer={null}>
         <Form form={editForm} layout="vertical" onFinish={handleEditSubmit} style={{ marginTop: 16 }}>
+          <Form.Item name="name" label="Activity Name" rules={[{ required: true, message: "Name is required" }]}>
+            <Input />
+          </Form.Item>
           <Form.Item name="date" label="Date" rules={[{ required: true, message: "Date is required" }]}>
             <DatePicker style={{ width: "100%" }} />
           </Form.Item>
