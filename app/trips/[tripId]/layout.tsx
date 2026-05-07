@@ -30,8 +30,12 @@ function TripLayoutInner({ children }: { children: React.ReactNode }) {
       const data = await apiService.get<Trip>(`/trips/${tripId}`);
       setTrip(data);
       localStorage.setItem(`trip-${tripId}-admin`, JSON.stringify(data.adminUsername ?? ""));
-    } catch { /* ignore */ } finally { setLoading(false); }
-  }, [apiService, tripId]);
+      setLoading(false);
+    } catch {
+      message.error("Trip not found or you don't have access.");
+      router.push(`/users/${userId}/trips`);
+    }
+  }, [apiService, tripId, router, userId, message]);
 
   useEffect(() => { fetchTrip(); }, [fetchTrip]);
 
