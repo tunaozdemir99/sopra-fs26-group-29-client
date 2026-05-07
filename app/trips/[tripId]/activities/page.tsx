@@ -55,6 +55,7 @@ const TimelinePage: React.FC = () => {
   const [editForm] = Form.useForm();
   const { message } = App.useApp();
   const [tripStartDate, setTripStartDate] = useState<string | null>(null);
+  const [tripEndDate, setTripEndDate] = useState<string | null>(null);
 
   const fetchActivities = useCallback(async () => {
     try {
@@ -72,6 +73,7 @@ const TimelinePage: React.FC = () => {
   useEffect(() => {
     apiService.get<Trip>(`/trips/${tripId}`).then((data) => {
       setTripStartDate(data.startDate);
+      setTripEndDate(data.endDate);
     }).catch(() => {});
   }, [apiService, tripId]);
 
@@ -344,10 +346,14 @@ const TimelinePage: React.FC = () => {
             <Input placeholder="e.g. Hiking at Uetliberg" />
           </Form.Item>
           <Form.Item name="date" label="Date" rules={[{ required: true, message: "Date is required" }]}>
-            <DatePicker
-              style={{ width: "100%" }}
-              defaultPickerValue={tripStartDate ? dayjs(tripStartDate) : undefined}
-            />
+          <DatePicker
+            style={{ width: "100%" }}
+            defaultPickerValue={tripStartDate ? dayjs(tripStartDate) : undefined}
+            disabledDate={(d) =>
+              (tripStartDate ? d.isBefore(dayjs(tripStartDate), "day") : false) ||
+              (tripEndDate ? d.isAfter(dayjs(tripEndDate), "day") : false)
+            }
+          />
           </Form.Item>
           <Form.Item name="startTime" label="Start Time" rules={[{ required: true, message: "Start time is required" }]}>
             <TimePicker format="HH:mm" style={{ width: "100%" }} />
@@ -381,7 +387,13 @@ const TimelinePage: React.FC = () => {
             <Input />
           </Form.Item>
           <Form.Item name="date" label="Date" rules={[{ required: true, message: "Date is required" }]}>
-            <DatePicker style={{ width: "100%" }} />
+          <DatePicker
+            style={{ width: "100%" }}
+            disabledDate={(d) =>
+              (tripStartDate ? d.isBefore(dayjs(tripStartDate), "day") : false) ||
+              (tripEndDate ? d.isAfter(dayjs(tripEndDate), "day") : false)
+            }
+          />
           </Form.Item>
           <Form.Item name="startTime" label="Start Time" rules={[{ required: true, message: "Start time is required" }]}>
             <TimePicker format="HH:mm" style={{ width: "100%" }} />
