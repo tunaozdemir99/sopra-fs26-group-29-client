@@ -142,9 +142,15 @@ reason).
 
 ---
 
-## Contributions Week 5 - [Begin Date] to [End Date]
-
-_Continue with the same table format as above._
+## Contributions Week 5 - 06.05.2026 to 12.05.2026
+| **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
+| ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| **[@dogamentese]** | 07.05.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/f122cc9d2a0cbbb9aa73a2c0a08e8e3b0f54b588 | Fixed the client so that navigating to a URL with a nonexistent trip ID no longer renders a phantom trip page. | Prevents users from landing on a visually valid-looking page that contains no real trip, which could cause confusion or unintended interactions. |
+|                    | 07.05.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/0653a589699aa8c744bedb919587cc03d9f39436 | Added a name input field to the activity editing form in the UI. | This implementation was needed since not being able to edit an activity name would be a big inconvenience to users if they made a typo. |
+|                    | 07.05.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/8a7f013110f38080845d543b92b30ac1a803e4c7 | Added an authentication check on the trips page that redirects unauthenticated users away. | Essential for protecting users' data. |
+|                    | 07.05.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/5308ed075b8cff66a8e7f5068d1936de0c65df30 | Disabled past dates in the frontend date picker component during trip creation. | Provides immediate UI-level feedback to users, preventing invalid submissions before they even reach the server. |
+|                    | 07.05.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/afd74f967629b7ef75431eb7858cb16b9001d2f0 | Fixed the backend endpoint to accept and save updates to an activity's name field. | Without this, users could not rename activities after creation, leaving the edit feature incomplete. |
+|                    | 07.05.2026   | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/f0fa24dc6f90a615993865f1233c359ceebfa201 | Validates on the server that a trip's start date is not in the past before persisting it. |  Prevents invalid trip data from entering the database, which would cause logical errors in scheduling and display. |
 
 ---
 
