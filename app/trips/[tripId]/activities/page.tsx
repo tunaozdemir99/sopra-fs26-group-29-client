@@ -11,6 +11,7 @@ import { DeleteOutlined, EditOutlined, PlusOutlined, EnvironmentOutlined, ClockC
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import { Activity } from "@/types/activity";
+import { Trip } from "@/types/trip"; 
 import LocationSearch, { SelectedLocation } from "@/components/LocationSearch";
 
 
@@ -53,6 +54,7 @@ const TimelinePage: React.FC = () => {
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
   const { message } = App.useApp();
+  const [tripStartDate, setTripStartDate] = useState<string | null>(null);
 
   const fetchActivities = useCallback(async () => {
     try {
@@ -66,6 +68,12 @@ const TimelinePage: React.FC = () => {
     const interval = setInterval(fetchActivities, 5000);
     return () => clearInterval(interval);
   }, [fetchActivities]);
+
+  useEffect(() => {
+    apiService.get<Trip>(`/trips/${tripId}`).then((data) => {
+      setTripStartDate(data.startDate);
+    }).catch(() => {});
+  }, [apiService, tripId]);
 
   // Compute travel times via OSRM for consecutive same-day pairs that have coordinates
   useEffect(() => {
@@ -336,7 +344,10 @@ const TimelinePage: React.FC = () => {
             <Input placeholder="e.g. Hiking at Uetliberg" />
           </Form.Item>
           <Form.Item name="date" label="Date" rules={[{ required: true, message: "Date is required" }]}>
-            <DatePicker style={{ width: "100%" }} />
+            <DatePicker
+              style={{ width: "100%" }}
+              defaultPickerValue={tripStartDate ? dayjs(tripStartDate) : undefined}
+            />
           </Form.Item>
           <Form.Item name="startTime" label="Start Time" rules={[{ required: true, message: "Start time is required" }]}>
             <TimePicker format="HH:mm" style={{ width: "100%" }} />
