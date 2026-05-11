@@ -49,7 +49,8 @@ function TripLayoutInner({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const activeKey = pathname.endsWith("/ideaBucket") ? "ideaBucket"
+  const activeKey = pathname.endsWith("/settings") ? "settings"
+    : pathname.endsWith("/ideaBucket") ? "ideaBucket"
     : pathname.endsWith("/activities") ? "activities"
     : pathname.endsWith("/map") ? "map"
     : pathname.endsWith("/tasks") ? "tasks"
@@ -67,6 +68,7 @@ function TripLayoutInner({ children }: { children: React.ReactNode }) {
     { key: "activities", label: "Activities",    children: activeKey === "activities" ? children : <></> },
     { key: "map",        label: "Map",           children: activeKey === "map"        ? children : <></> },
     { key: "tasks",      label: "Tasks",         children: activeKey === "tasks"      ? children : <></> },
+    { key: "settings",   label: "Settings",      children: activeKey === "settings" ? children : <></> },
   ];
 
   if (loading) return (
