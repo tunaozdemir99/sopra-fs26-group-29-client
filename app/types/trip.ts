@@ -7,4 +7,5 @@ export interface Trip {
   createdAt?: string;
   inviteUrl?: string;
   adminUsername?: string;
+  adminId?: number;
 }
