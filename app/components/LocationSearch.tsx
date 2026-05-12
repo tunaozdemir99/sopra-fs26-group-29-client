@@ -20,12 +20,14 @@ export interface SelectedLocation {
 
 interface LocationSearchProps {
   onSelect: (location: SelectedLocation) => void;
+  onClear?: () => void;
   placeholder?: string;
   initialValue?: string;
 }
 
 const LocationSearch: React.FC<LocationSearchProps> = ({
   onSelect,
+  onClear,
   placeholder = "Search for a location...",
   initialValue = "",
 }) => {
@@ -78,7 +80,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     <div style={{ position: "relative" }}>
       <Input
         value={query}
-        onChange={(e) => { userTypedRef.current = true; setQuery(e.target.value); setSelected(null); }}
+        onChange={(e) => { userTypedRef.current = true; setQuery(e.target.value); setSelected(null); onClear?.(); }}
         placeholder={placeholder}
         prefix={<EnvironmentOutlined style={{ color: "#2563eb" }} />}
         suffix={loading ? <Spin size="small" /> : null}

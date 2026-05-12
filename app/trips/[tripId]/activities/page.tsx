@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import {
   Alert, App, Button, Card, DatePicker, Form, InputNumber, Modal, Empty,
-  TimePicker, Typography, Input, Tag,
+  Select, Typography, Input, Tag,
 } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined, EnvironmentOutlined, ClockCircleOutlined, BulbOutlined, WarningOutlined, CloseCircleOutlined, ArrowRightOutlined, CarOutlined} from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -16,6 +16,12 @@ import LocationSearch, { SelectedLocation } from "@/components/LocationSearch";
 
 
 const { Title, Text } = Typography;
+
+const TIME_OPTIONS = Array.from({ length: 96 }, (_, i) => {
+  const h = String(Math.floor(i / 4)).padStart(2, "0");
+  const m = String((i % 4) * 15).padStart(2, "0");
+  return `${h}:${m}`;
+});
 
 const formatDuration = (minutes: number | null): string | null => {
   if (minutes === null) return null;
@@ -117,8 +123,8 @@ const TimelinePage: React.FC = () => {
   const handleSubmit = async (values: {
     name: string;
     date: Dayjs;
-    startTime: Dayjs;
-    endTime: Dayjs;
+    startTime: string;
+    endTime: string;
     locationName?: string;
     latitude?: number;
     longitude?: number;
@@ -128,8 +134,8 @@ const TimelinePage: React.FC = () => {
       await apiService.post<Activity>(`/trips/${tripId}/timeline`, {
         name: values.name,
         date: values.date.format("YYYY-MM-DD"),
-        startTime: values.startTime.format("HH:mm:ss"),
-        endTime: values.endTime.format("HH:mm:ss"),
+        startTime: values.startTime + ":00",
+        endTime: values.endTime + ":00",
         locationName: values.locationName ?? null,
         latitude: values.latitude ?? null,
         longitude: values.longitude ?? null,
@@ -156,8 +162,8 @@ const TimelinePage: React.FC = () => {
     editForm.setFieldsValue({
       name: activity.name,
       date: dayjs(activity.date),
-      startTime: dayjs(activity.startTime, "HH:mm:ss"),
-      endTime: dayjs(activity.endTime, "HH:mm:ss"),
+      startTime: activity.startTime.slice(0, 5),
+      endTime: activity.endTime.slice(0, 5),
       locationName: activity.locationName ?? "",
       latitude: activity.latitude ?? null,
       longitude: activity.longitude ?? null,
@@ -168,8 +174,8 @@ const TimelinePage: React.FC = () => {
   const handleEditSubmit = async (values: {
     name: string;
     date: Dayjs;
-    startTime: Dayjs;
-    endTime: Dayjs;
+    startTime: string;
+    endTime: string;
     locationName?: string;
     latitude?: number;
     longitude?: number;
@@ -180,8 +186,8 @@ const TimelinePage: React.FC = () => {
       await apiService.put<Activity>(`/trips/${tripId}/timeline/${editingActivity.activityId}`, {
         name: values.name,
         date: values.date.format("YYYY-MM-DD"),
-        startTime: values.startTime.format("HH:mm:ss"),
-        endTime: values.endTime.format("HH:mm:ss"),
+        startTime: values.startTime + ":00",
+        endTime: values.endTime + ":00",
         locationName: values.locationName || null,
         latitude: values.latitude ?? null,
         longitude: values.longitude ?? null,
@@ -211,6 +217,9 @@ const TimelinePage: React.FC = () => {
     if (cur.gapToNextActivityMinutes !== null) return cur.gapToNextActivityMinutes < 0;
     return cur.date === next.date && toMinutes(cur.endTime) > toMinutes(next.startTime);
   };
+
+  const addStartTime = Form.useWatch("startTime", form);
+  const editStartTime = Form.useWatch("startTime", editForm);
 
   const handleLocationSelect = (loc: SelectedLocation, formInstance: ReturnType<typeof Form.useForm>[0]) => {
     formInstance.setFieldsValue({
@@ -356,10 +365,23 @@ const TimelinePage: React.FC = () => {
           />
           </Form.Item>
           <Form.Item name="startTime" label="Start Time" rules={[{ required: true, message: "Start time is required" }]}>
-            <TimePicker format="HH:mm" style={{ width: "100%" }} />
+            <Select
+              options={TIME_OPTIONS.map(t => ({ label: t, value: t }))}
+              placeholder="Select start time"
+              style={{ width: "100%" }}
+              onChange={(val) => {
+                const end = form.getFieldValue("endTime");
+                if (end && end <= val) form.setFieldValue("endTime", undefined);
+              }}
+            />
           </Form.Item>
           <Form.Item name="endTime" label="End Time" rules={[{ required: true, message: "End time is required" }]}>
-            <TimePicker format="HH:mm" style={{ width: "100%" }} />
+            <Select
+              options={TIME_OPTIONS.filter(t => !addStartTime || t > addStartTime).map(t => ({ label: t, value: t }))}
+              placeholder="Select end time"
+              disabled={!addStartTime}
+              style={{ width: "100%" }}
+            />
           </Form.Item>
           <Form.Item label="Location" required>
             <LocationSearch
@@ -396,20 +418,34 @@ const TimelinePage: React.FC = () => {
           />
           </Form.Item>
           <Form.Item name="startTime" label="Start Time" rules={[{ required: true, message: "Start time is required" }]}>
-            <TimePicker format="HH:mm" style={{ width: "100%" }} />
+            <Select
+              options={TIME_OPTIONS.map(t => ({ label: t, value: t }))}
+              placeholder="Select start time"
+              style={{ width: "100%" }}
+              onChange={(val) => {
+                const end = editForm.getFieldValue("endTime");
+                if (end && end <= val) editForm.setFieldValue("endTime", undefined);
+              }}
+            />
           </Form.Item>
           <Form.Item name="endTime" label="End Time" rules={[{ required: true, message: "End time is required" }]}>
-            <TimePicker format="HH:mm" style={{ width: "100%" }} />
+            <Select
+              options={TIME_OPTIONS.filter(t => !editStartTime || t > editStartTime).map(t => ({ label: t, value: t }))}
+              placeholder="Select end time"
+              disabled={!editStartTime}
+              style={{ width: "100%" }}
+            />
           </Form.Item>
-          <Form.Item label="Location">
+          <Form.Item label="Location" required>
             <LocationSearch
               key={editingActivity?.activityId}
               placeholder="Search for a location..."
               initialValue={editingActivity?.locationName ?? ""}
               onSelect={(loc) => handleLocationSelect(loc, editForm)}
+              onClear={() => editForm.setFieldsValue({ locationName: undefined, latitude: null, longitude: null })}
             />
           </Form.Item>
-          <Form.Item name="locationName" noStyle><Input type="hidden" /></Form.Item>
+          <Form.Item name="locationName" rules={[{ required: true, message: "Please select a location" }]}><Input type="hidden" /></Form.Item>
           <Form.Item name="latitude" noStyle><InputNumber style={{ display: "none" }} /></Form.Item>
           <Form.Item name="longitude" noStyle><InputNumber style={{ display: "none" }} /></Form.Item>
           <Form.Item>

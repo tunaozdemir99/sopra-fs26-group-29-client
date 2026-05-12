@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { App, Button, Card, DatePicker, Form, Input, Modal, Empty, Select, TimePicker, Typography, Popconfirm } from "antd";
+import { App, Button, Card, DatePicker, Form, Input, Modal, Empty, Select, Typography, Popconfirm } from "antd";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import { BulbOutlined, DeleteOutlined, EditOutlined, EnvironmentOutlined, CalendarOutlined, LikeOutlined, DislikeOutlined } from "@ant-design/icons";
@@ -16,6 +16,12 @@ import type { SelectedLocation } from "@/components/LocationSearch";
 const LocationSearch = dynamic(() => import("@/components/LocationSearch"), { ssr: false });
 
 const { Title, Text } = Typography;
+
+const TIME_OPTIONS = Array.from({ length: 96 }, (_, i) => {
+  const h = String(Math.floor(i / 4)).padStart(2, "0");
+  const m = String((i % 4) * 15).padStart(2, "0");
+  return `${h}:${m}`;
+});
 
 const IdeaBucketPage: React.FC = () => {
   const { tripId } = useParams<{ tripId: string }>();
@@ -30,6 +36,7 @@ const IdeaBucketPage: React.FC = () => {
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
   const [scheduleForm] = Form.useForm();
+  const scheduleStartTime = Form.useWatch("startTime", scheduleForm);
   const locationRef = useRef<SelectedLocation | null>(null);
   const editLocationRef = useRef<SelectedLocation | null>(null);
   const [sortOrder, setSortOrder] = useState<"votes" | "recency">("recency");
@@ -110,14 +117,14 @@ const IdeaBucketPage: React.FC = () => {
     } catch (e) { message.error((e as Error).message ?? "Failed to vote"); }
   };
 
-  const handleSchedule = async (values: { date: Dayjs; startTime: Dayjs; endTime: Dayjs }) => {
+  const handleSchedule = async (values: { date: Dayjs; startTime: string; endTime: string }) => {
   if (!schedulingItem) return;
   try {
     await apiService.post(`/trips/${tripId}/timeline`, {
       bucketItemId: schedulingItem.bucketItemId,
       date: values.date.format("YYYY-MM-DD"),
-      startTime: values.startTime.format("HH:mm"),
-      endTime: values.endTime.format("HH:mm"),
+      startTime: values.startTime,
+      endTime: values.endTime,
     });
     setSchedulingItem(null);
     scheduleForm.resetFields();
@@ -279,10 +286,23 @@ const IdeaBucketPage: React.FC = () => {
           />
           </Form.Item>
           <Form.Item name="startTime" label="Start Time" rules={[{ required: true, message: "Start time is required" }]}>
-            <TimePicker style={{ width: "100%" }} format="HH:mm" minuteStep={15} />
+            <Select
+              options={TIME_OPTIONS.map(t => ({ label: t, value: t }))}
+              placeholder="Select start time"
+              style={{ width: "100%" }}
+              onChange={(val) => {
+                const end = scheduleForm.getFieldValue("endTime");
+                if (end && end <= val) scheduleForm.setFieldValue("endTime", undefined);
+              }}
+            />
           </Form.Item>
           <Form.Item name="endTime" label="End Time" rules={[{ required: true, message: "End time is required" }]}>
-            <TimePicker style={{ width: "100%" }} format="HH:mm" minuteStep={15} />
+            <Select
+              options={TIME_OPTIONS.filter(t => !scheduleStartTime || t > scheduleStartTime).map(t => ({ label: t, value: t }))}
+              placeholder="Select end time"
+              disabled={!scheduleStartTime}
+              style={{ width: "100%" }}
+            />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" block>Schedule Activity</Button>
