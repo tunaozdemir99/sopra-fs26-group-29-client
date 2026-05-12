@@ -6,8 +6,10 @@ import dynamic from "next/dynamic";
 import { useApi } from "@/hooks/useApi";
 import { App, Button, Card, DatePicker, Empty, Form, Input, Modal, Popconfirm, Select, Typography } from "antd";
 import { CalendarOutlined, DeleteOutlined, EnvironmentOutlined, PushpinOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import LocationSearch, { SelectedLocation } from "@/components/LocationSearch";
+import { Trip } from "@/types/trip";
 import type { MapMarker } from "@/components/TripMap";
 
 const TripMap = dynamic(() => import("@/components/TripMap"), { ssr: false });
@@ -36,8 +38,17 @@ const MapPage: React.FC = () => {
   const [pinning, setPinning] = useState(false);
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const [scheduling, setScheduling] = useState(false);
+  const [tripStartDate, setTripStartDate] = useState<string | null>(null);
+  const [tripEndDate, setTripEndDate] = useState<string | null>(null);
   const [scheduleForm] = Form.useForm();
   const scheduleStartTime = Form.useWatch("startTime", scheduleForm);
+
+  useEffect(() => {
+    apiService.get<Trip>(`/trips/${tripId}`).then((data) => {
+      setTripStartDate(data.startDate);
+      setTripEndDate(data.endDate);
+    }).catch(() => {});
+  }, [apiService, tripId]);
 
   const fetchPins = useCallback(async () => {
     try {
@@ -208,7 +219,14 @@ const MapPage: React.FC = () => {
             <Input placeholder="e.g. Visit the lake" />
           </Form.Item>
           <Form.Item name="date" label="Date" rules={[{ required: true, message: "Date is required" }]}>
-            <DatePicker style={{ width: "100%" }} />
+            <DatePicker
+              style={{ width: "100%" }}
+              defaultPickerValue={tripStartDate ? dayjs(tripStartDate) : undefined}
+              disabledDate={(d) =>
+                (tripStartDate ? d.isBefore(dayjs(tripStartDate), "day") : false) ||
+                (tripEndDate ? d.isAfter(dayjs(tripEndDate), "day") : false)
+              }
+            />
           </Form.Item>
           <Form.Item name="startTime" label="Start Time" rules={[{ required: true, message: "Start time is required" }]}>
             <Select
