@@ -161,6 +161,9 @@ reason).
 |                    | 11.05.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/f1de7b02a8a07c741857f2dc762b0fbce084cf25 | Add delete trip service and controller tests (#115 #116) | Covers admin/non-admin/invalid token/not found scenarios for trip deletion |
 |                    | 11.05.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/be0319fe6e99f82dba6ee1e1676bd21c184b19e1 | Add adminId to TripGetDTO for frontend authorization | Enables client-side admin check without extra API call |
 |                    | 11.05.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/a966448c2c4019a0f7a3d1c81f69e6e6bc124f85 | Add settings page with admin trip deletion (#69) | Frontend Danger Zone with confirmation dialog, redirects members on deletion |
+| **[@adnana24i]** | 12.05.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/ea88a7c651da18854cac401034a4f909e7194c55 | Improved the time selection UI for activities, fixing UX issues with the time picker component (#131) | Makes scheduling activities clearer and less error-prone for users |
+|                    | 12.05.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/e12a247a0efcf4fed312b4b9b9c328cb49c85538 | Added UI-level enforcement to prevent scheduling activities on dates outside the trip's timeframe (#108) | Prevents invalid activity dates from being submitted, complementing the server-side date range validation |
+|                    | 12.05.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/011476ec2f3afa73a0176094ff1dcc735b1339f7 | Fixed a bug where users could select an invalid location when editing an existing activity (#107) | Ensures location data remains valid on activity updates, preventing corrupt timeline entries |
 
 ---
 
