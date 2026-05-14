@@ -5,12 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { App, Button, Card, Input, Popconfirm, Spin, Typography } from "antd";
-import {
-  DeleteOutlined,
-  InfoCircleOutlined,
-  LinkOutlined,
-} from "@ant-design/icons";
-
+import { DeleteOutlined, InfoCircleOutlined, LinkOutlined, LogoutOutlined } from "@ant-design/icons";
 import { Trip } from "@/types/trip";
 
 const { Title, Text } = Typography;
@@ -26,6 +21,7 @@ const SettingsPage: React.FC = () => {
   const [trip, setTrip] = useState<Trip | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -61,6 +57,20 @@ const SettingsPage: React.FC = () => {
       setDeleting(false);
     }
   };
+
+  const handleLeave = async () => {
+    setLeaving(true);
+    try {
+      await apiService.delete(`/trips/${tripId}/members/${userId}`);
+      router.push(`/users/${userId}/trips`);
+    } catch (error) {
+      const e = error as Error;
+      message.error(e.message ?? "Failed to leave trip");
+    } finally {
+      setLeaving(false);
+    }
+  };
+
 
   const isAdmin = String(userId) === String(trip?.adminId);
 
@@ -177,6 +187,29 @@ const SettingsPage: React.FC = () => {
           </div>
         </Card>
       )}
+
+      {/* Leave Trip — all members */}
+      <Card style={{ marginBottom: 16 }}>
+        <Title level={4}>Leave Trip</Title>
+        <Text>
+          {isAdmin
+            ? "As the admin, you must transfer admin rights to another member before leaving the trip."
+            : "Remove yourself from this trip. You will need a new invite to rejoin."}
+        </Text>
+        <div style={{ marginTop: 16 }}>
+          <Popconfirm
+            title="Leave this trip?"
+            description={isAdmin ? "Transfer admin rights first in the Members tab." : "You will need a new invite to rejoin."}
+            onConfirm={handleLeave}
+            okText="Leave"
+            cancelText="Cancel"
+          >
+            <Button icon={<LogoutOutlined />} loading={leaving}>
+              Leave Trip
+            </Button>
+          </Popconfirm>
+        </div>
+      </Card>
 
       {/* Danger zone — admin only */}
       {isAdmin && (
