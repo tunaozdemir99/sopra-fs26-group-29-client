@@ -170,6 +170,15 @@ task] | [Why this contribution is relevant] | | | [date] | [Link to Commit 2] |
 
 ---
 
-## Contributions Week 6 - [Begin Date] to [End Date]
+## Contributions Week 6 - 13.05.2026 to 19.05.2026
+
+| **Student**          | **Date**   | **Link to Commit**                                                                                          | **Description**                                                                                                                    | **Relevance**                                                                                                                                    |
+| -------------------- | ---------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **[@stella-sy-x]**   | 14.05.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/287bf36af946f5a13ab56b11c0e12c1e6ed97740 | Add member management — add/remove members and list (#118) | Core admin endpoints for managing trip membership |
+|                      | 14.05.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/285e1d7ee27f4b69a025b0c2709704c4c4fb1c8e | Add admin transfer endpoint (#121) | Enables admin to hand off trip ownership to another member |
+|                      | 14.05.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/7bcc73858810de4636a7cf5dcc822919f41550d7 | Add invite link get and regenerate endpoints (#119) | Admin can view and regenerate invite link, invalidating old one |
+|                      | 14.05.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/78e5434d6ea1d0399302c3153d815cffecff47dc | Add invite link activate/deactivate endpoint (#119) | Admin can toggle invite link on/off without changing the URL |
+|                      | 14.05.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-server/commit/67dd5446b6cacaf104af4af8932ec377e510d5d7 | Add member management and invite link tests (#118 #119 #120 #121) | 17 unit tests covering add/remove members, admin transfer, invite management, and access revocation |
+|                      | 14.05.2026 | https://github.com/tunaozdemir99/sopra-fs26-group-29-client/commit/4e498d2c66c308239bc5332086e7d596ac227cf3 | Add members page, admin transfer, and invite management UI | Frontend for S15 — member list with add/remove, transfer admin modal, invite link copy/regenerate/toggle |
 
 _Continue with the same table format as above._
