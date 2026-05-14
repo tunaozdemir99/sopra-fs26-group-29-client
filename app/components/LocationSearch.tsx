@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Input, Spin, Typography } from "antd";
 import { EnvironmentOutlined } from "@ant-design/icons";
 
@@ -40,11 +40,16 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   const userTypedRef = useRef(false);
 
   const search = async (q: string) => {
-    if (!q.trim()) { setResults([]); return; }
+    if (!q.trim()) {
+      setResults([]);
+      return;
+    }
     setLoading(true);
     setResults([]);
     try {
-      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=5`;
+      const url = `https://nominatim.openstreetmap.org/search?q=${
+        encodeURIComponent(q)
+      }&format=json&limit=5`;
       const res = await fetch(url, { headers: { "Accept-Language": "en" } });
       const data: GeoResult[] = await res.json();
       setResults(data);
@@ -57,10 +62,15 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
 
   useEffect(() => {
     if (!userTypedRef.current) return;
-    if (skipSearchRef.current) { skipSearchRef.current = false; return; }
+    if (skipSearchRef.current) {
+      skipSearchRef.current = false;
+      return;
+    }
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => search(query), 400);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, [query]);
 
   const handleSelect = (item: GeoResult) => {
@@ -80,26 +90,33 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     <div style={{ position: "relative" }}>
       <Input
         value={query}
-        onChange={(e) => { userTypedRef.current = true; setQuery(e.target.value); setSelected(null); onClear?.(); }}
+        onChange={(e) => {
+          userTypedRef.current = true;
+          setQuery(e.target.value);
+          setSelected(null);
+          onClear?.();
+        }}
         placeholder={placeholder}
         prefix={<EnvironmentOutlined style={{ color: "#2563eb" }} />}
         suffix={loading ? <Spin size="small" /> : null}
       />
 
       {results.length > 0 && (
-        <div style={{
-          position: "absolute",
-          top: "100%",
-          left: 0,
-          right: 0,
-          background: "#fff",
-          border: "1px solid #dbeafe",
-          borderRadius: 8,
-          zIndex: 1000,
-          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          maxHeight: 200,
-          overflowY: "auto",
-        }}>
+        <div
+          style={{
+            position: "absolute",
+            top: "100%",
+            left: 0,
+            right: 0,
+            background: "#fff",
+            border: "1px solid #dbeafe",
+            borderRadius: 8,
+            zIndex: 1000,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            maxHeight: 200,
+            overflowY: "auto",
+          }}
+        >
           {results.map((item) => (
             <button
               key={`${item.lat},${item.lon}`}
@@ -114,17 +131,26 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
                 border: "none",
               }}
               onClick={() => handleSelect(item)}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#eff6ff")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+              onMouseEnter={(
+                e,
+              ) => (e.currentTarget.style.background = "#eff6ff")}
+              onMouseLeave={(
+                e,
+              ) => (e.currentTarget.style.background = "transparent")}
             >
-              <Text style={{ fontSize: 13, color: "#111" }}>{item.display_name}</Text>
+              <Text style={{ fontSize: 13, color: "#111" }}>
+                {item.display_name}
+              </Text>
             </button>
           ))}
         </div>
       )}
 
       {selected && results.length === 0 && (
-        <Text type="secondary" style={{ fontSize: 12, display: "block", marginTop: 4 }}>
+        <Text
+          type="secondary"
+          style={{ fontSize: 12, display: "block", marginTop: 4 }}
+        >
           📍 {selected.lat.toFixed(4)}, {selected.lng.toFixed(4)}
         </Text>
       )}

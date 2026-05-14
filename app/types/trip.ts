@@ -6,6 +6,7 @@ export interface Trip {
   endDate: string;
   createdAt?: string;
   inviteUrl?: string;
+  inviteActive?: boolean;
   adminUsername?: string;
   adminId?: number;
 }

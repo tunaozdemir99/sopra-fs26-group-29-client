@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"; // use NextJS router for navigation
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
-import { App, Button, Form, Input, Card, Typography, notification } from "antd";
+import { App, Button, Card, Form, Input, notification, Typography } from "antd";
 // Optionally, you can import a CSS module or file for additional styling:
 // import styles from "@/styles/page.module.css";
 
@@ -29,7 +29,7 @@ const Register: React.FC = () => {
   } = useLocalStorage<string>("token", ""); // note that the key we are selecting is "token" and the default value we are setting is an empty string
   // if you want to pick a different token, i.e "usertoken", the line above would look as follows: } = useLocalStorage<string>("usertoken", "");
 
-  const { set: setUserId } = useLocalStorage<string>("userId", "");   // saving the logged in user's id to localstorage --> later used for password update
+  const { set: setUserId } = useLocalStorage<string>("userId", ""); // saving the logged in user's id to localstorage --> later used for password update
 
   const handleRegister = async (values: FormFieldProps) => {
     try {
@@ -41,8 +41,8 @@ const Register: React.FC = () => {
         setToken(response.token);
       }
 
-      setUserId(String(response.id));   // saving the logged in user's id to localstorage
-      
+      setUserId(String(response.id)); // saving the logged in user's id to localstorage
+
       // Navigate to the user overview
       notification.success({
         title: "Account created successfully!",
@@ -50,7 +50,6 @@ const Register: React.FC = () => {
         className: "custom-notification",
       });
       setTimeout(() => router.push(`/users/${response.id}/trips`), 1500); // --> dashboard
-
     } catch (error) {
       if (error instanceof Error) {
         const appError = error as { status?: number };
@@ -61,11 +60,11 @@ const Register: React.FC = () => {
             className: "custom-notification",
           });
         } else {
-            notification.error({
-              title: "Registration failed. Please try again.",
-              placement: "bottomRight",
-              className: "custom-notification",
-            });
+          notification.error({
+            title: "Registration failed. Please try again.",
+            placement: "bottomRight",
+            className: "custom-notification",
+          });
         }
       } else {
         console.error("An unknown error occurred during registration.");
@@ -74,18 +73,51 @@ const Register: React.FC = () => {
   };
 
   const { Title, Text } = Typography;
-  
+
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, #eff6ff, #e0e7ff)", padding: 16 }}>
-    <Card style={{ width: "100%", maxWidth: 448, background: "#fff"}}>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 24 }}>
-        <div style={{ width: 80, height: 80, background: "#2563eb", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
-          <span style={{ fontSize: 36 }}>✈️</span>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(135deg, #eff6ff, #e0e7ff)",
+        padding: 16,
+      }}
+    >
+      <Card style={{ width: "100%", maxWidth: 448, background: "#fff" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            marginBottom: 24,
+          }}
+        >
+          <div
+            style={{
+              width: 80,
+              height: 80,
+              background: "#2563eb",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 8,
+            }}
+          >
+            <span style={{ fontSize: 36 }}>✈️</span>
+          </div>
+          <Title level={2} style={{ margin: 0, color: "#000" }}>
+            JointJourney
+          </Title>
+          <Text type="secondary" style={{ color: "#666" }}>
+            Create an account
+          </Text>
+          <Text type="secondary" style={{ color: "#666" }}>
+            Sign up to start planning your trips
+          </Text>
         </div>
-        <Title level={2} style={{ margin: 0, color: "#000" }}>JointJourney</Title>
-        <Text type="secondary" style={{ color: "#666" }}>Create an account</Text>
-        <Text type="secondary" style={{ color: "#666" }}>Sign up to start planning your trips</Text>
-      </div>
         <Form
           form={form}
           name="register"
@@ -99,23 +131,43 @@ const Register: React.FC = () => {
             label={<span style={{ color: "#000" }}>Username</span>}
             rules={[{ required: true, message: "Please input your username!" }]}
           >
-            <Input placeholder="Enter username" style={{ background: "#fff", color: "#000" }} />
+            <Input
+              placeholder="Enter username"
+              style={{ background: "#fff", color: "#000" }}
+            />
           </Form.Item>
           <Form.Item
             name="password"
             label={<span style={{ color: "#000" }}>Password</span>}
             rules={[{ required: true, message: "Please input a password!" }]}
           >
-            <Input.Password placeholder="Enter password" style={{ background: "#fff", color: "#000" }} />
+            <Input.Password
+              placeholder="Enter password"
+              style={{ background: "#fff", color: "#000" }}
+            />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: "100%", background: "#000", borderColor: "#000" }}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{ width: "100%", background: "#000", borderColor: "#000" }}
+            >
               Create Account
             </Button>
           </Form.Item>
-          <div style={{ textAlign: "center", marginTop: 16, fontSize: 14, color: "#000" }}>
+          <div
+            style={{
+              textAlign: "center",
+              marginTop: 16,
+              fontSize: 14,
+              color: "#000",
+            }}
+          >
             Already have an account?{" "}
-            <a onClick={() => router.push("/login")} style={{ color: "#2563eb", cursor: "pointer" }}>
+            <a
+              onClick={() => router.push("/login")}
+              style={{ color: "#2563eb", cursor: "pointer" }}
+            >
               Sign in
             </a>
           </div>
