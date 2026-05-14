@@ -19,6 +19,7 @@ const SettingsPage: React.FC = () => {
   const { message } = App.useApp();
 
   const [trip, setTrip] = useState<Trip | null>(null);
+  const [memberCount, setMemberCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [leaving, setLeaving] = useState(false);
@@ -33,6 +34,8 @@ const SettingsPage: React.FC = () => {
     try {
       const data = await apiService.get<Trip>(`/trips/${tripId}`);
       setTrip(data);
+      const members = await apiService.get<{ id: number }[]>(`/trips/${tripId}/members`);
+      setMemberCount(members.length);
     } catch {
       message.error("Failed to load trip settings");
     } finally {
@@ -73,6 +76,7 @@ const SettingsPage: React.FC = () => {
 
 
   const isAdmin = String(userId) === String(trip?.adminId);
+  const isOnlyMember = isAdmin && memberCount === 1;
 
   if (loading) {
     return (
@@ -192,14 +196,22 @@ const SettingsPage: React.FC = () => {
       <Card style={{ marginBottom: 16 }}>
         <Title level={4}>Leave Trip</Title>
         <Text>
-          {isAdmin
+          {isOnlyMember
+            ? "You are the only member. Leaving will permanently delete this trip."
+            : isAdmin
             ? "As the admin, you must transfer admin rights to another member before leaving the trip."
             : "Remove yourself from this trip. You will need a new invite to rejoin."}
         </Text>
         <div style={{ marginTop: 16 }}>
           <Popconfirm
             title="Leave this trip?"
-            description={isAdmin ? "Transfer admin rights first in the Members tab." : "You will need a new invite to rejoin."}
+            description={
+              isOnlyMember
+                ? "You are the only member. The trip will be permanently deleted."
+                : isAdmin
+                ? "Transfer admin rights first in the Members tab."
+                : "You will need a new invite to rejoin."
+            }
             onConfirm={handleLeave}
             okText="Leave"
             cancelText="Cancel"
