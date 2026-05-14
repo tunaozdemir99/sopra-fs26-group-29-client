@@ -25,6 +25,7 @@ function TripLayoutInner({ children }: { children: React.ReactNode }) {
   const { value: userId } = useLocalStorage<string>("userId", "");
   const [trip, setTrip] = useState<Trip | null>(null);
   const [loading, setLoading] = useState(true);
+  const isAdmin = trip ? String(userId) === String(trip.adminId) : false;
 
   useEffect(() => {
     if (!token) router.push("/login");
@@ -220,7 +221,7 @@ function TripLayoutInner({ children }: { children: React.ReactNode }) {
                   </Text>
                 </div>
               )}
-              {trip?.inviteUrl && (
+              {trip?.inviteUrl && isAdmin && (
                 <Tooltip title="Copy invite link to share with others">
                   <Button
                     icon={<ShareAltOutlined />}
