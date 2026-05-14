@@ -127,7 +127,10 @@ export class ApiService {
       headers: this.getHeaders(),
       body: JSON.stringify(data),
     });
-    return this.processResponse<T>(res, "An error occurred while updating the data.\n");
+    return this.processResponse<T>(
+      res,
+      "An error occurred while updating the data.\n",
+    );
   }
 
   /**

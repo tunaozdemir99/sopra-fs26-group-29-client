@@ -1,7 +1,14 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Popup,
+  TileLayer,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -9,7 +16,8 @@ import "leaflet/dist/leaflet.css";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
@@ -33,7 +41,9 @@ const FitBounds: React.FC<{ markers: MapMarker[] }> = ({ markers }) => {
 };
 
 /** Emit lat/lng when user clicks the map */
-const ClickHandler: React.FC<{ onMapClick: (lat: number, lng: number) => void }> = ({ onMapClick }) => {
+const ClickHandler: React.FC<
+  { onMapClick: (lat: number, lng: number) => void }
+> = ({ onMapClick }) => {
   useMapEvents({
     click(e) {
       onMapClick(e.latlng.lat, e.latlng.lng);
@@ -49,7 +59,9 @@ interface TripMapProps {
   height?: number | string;
 }
 
-const TripMap: React.FC<TripMapProps> = ({ markers, onMapClick, height = 400 }) => {
+const TripMap: React.FC<TripMapProps> = (
+  { markers, onMapClick, height = 400 },
+) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -57,7 +69,9 @@ const TripMap: React.FC<TripMapProps> = ({ markers, onMapClick, height = 400 }) 
       // React 18 strict-mode double-mounts components; clear Leaflet's container
       // ID on unmount so the second mount can initialise a fresh map instance.
       if (wrapperRef.current) {
-        const el = wrapperRef.current.querySelector(".leaflet-container") as HTMLElement & { _leaflet_id?: number };
+        const el = wrapperRef.current.querySelector(".leaflet-container") as
+          & HTMLElement
+          & { _leaflet_id?: number };
         if (el) delete el._leaflet_id;
       }
     };
@@ -83,7 +97,10 @@ const TripMap: React.FC<TripMapProps> = ({ markers, onMapClick, height = 400 }) 
         {onMapClick && <ClickHandler onMapClick={onMapClick} />}
 
         {markers.map((m) => (
-          <Marker key={`${m.lat}-${m.lng}-${m.label}`} position={[m.lat, m.lng]}>
+          <Marker
+            key={`${m.lat}-${m.lng}-${m.label}`}
+            position={[m.lat, m.lng]}
+          >
             <Popup>{m.label}</Popup>
           </Marker>
         ))}

@@ -93,7 +93,10 @@ const Dashboard: React.FC = () => {
                 style: { cursor: "pointer" },
               })}
             />
-            <Button onClick={() => router.push(`/users/${userId}`)} style={{ marginRight: 8 }}>
+            <Button
+              onClick={() => router.push(`/users/${userId}`)}
+              style={{ marginRight: 8 }}
+            >
               My Profile
             </Button>
             <Button onClick={handleLogout} type="primary">

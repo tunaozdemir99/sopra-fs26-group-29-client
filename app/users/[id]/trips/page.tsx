@@ -1,12 +1,27 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Trip } from "@/types/trip";
-import { App, Button, Card, Empty, Modal, Form, Input, DatePicker, Typography } from "antd";
-import { PlusOutlined, LogoutOutlined, QuestionCircleOutlined, CalendarOutlined } from "@ant-design/icons";
+import {
+  App,
+  Button,
+  Card,
+  DatePicker,
+  Empty,
+  Form,
+  Input,
+  Modal,
+  Typography,
+} from "antd";
+import {
+  CalendarOutlined,
+  LogoutOutlined,
+  PlusOutlined,
+  QuestionCircleOutlined,
+} from "@ant-design/icons";
 import dayjs, { type Dayjs } from "dayjs";
 
 const { Title, Text } = Typography;
@@ -17,7 +32,10 @@ const UserTripsDashboard: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const { value: token } = useLocalStorage<string>("token", "");
-  const { value: userId, clear: clearUserId } = useLocalStorage<string>("userId", "");
+  const { value: userId, clear: clearUserId } = useLocalStorage<string>(
+    "userId",
+    "",
+  );
   const { clear: clearToken } = useLocalStorage<string>("token", "");
 
   const [trips, setTrips] = useState<Trip[]>([]);
@@ -37,7 +55,6 @@ const UserTripsDashboard: React.FC = () => {
       router.push(`/users/${userId}/trips`);
     }
   }, [token, userId, id, router]);
-
 
   const fetchTrips = useCallback(async () => {
     try {
@@ -88,18 +105,24 @@ const UserTripsDashboard: React.FC = () => {
     try {
       const codeMatch = values.inviteCode.match(/\/invite\/([a-f0-9-]+)/i);
       const inviteCode = codeMatch ? codeMatch[1] : values.inviteCode.trim();
-      const result = await apiService.post<{ tripId: number; alreadyMember: boolean; message: string }>("/trips/join", { inviteCode });
+      const result = await apiService.post<
+        { tripId: number; alreadyMember: boolean; message: string }
+      >("/trips/join", { inviteCode });
       joinForm.resetFields();
       setJoinModalOpen(false);
       if (result.alreadyMember) {
-        message.info(result.message ?? "You are already a member of this trip.");
+        message.info(
+          result.message ?? "You are already a member of this trip.",
+        );
       } else {
         message.success("Joined trip successfully!");
       }
       router.push(`/trips/${result.tripId}`);
     } catch (error) {
       const e = error as Error;
-      message.error(e.message ?? "Failed to join trip. Please check the invite link.");
+      message.error(
+        e.message ?? "Failed to join trip. Please check the invite link.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -120,24 +143,63 @@ const UserTripsDashboard: React.FC = () => {
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
     const d = new Date(dateStr);
-    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    return d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #eff6ff, #e0e7ff)", padding: 24 }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #eff6ff, #e0e7ff)",
+        padding: 24,
+      }}
+    >
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
-
         {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 32 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            marginBottom: 32,
+          }}
+        >
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-              <div style={{ width: 36, height: 36, background: "#2563eb", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 4,
+              }}
+            >
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  background: "#2563eb",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
                 <span style={{ fontSize: 18 }}>✈️</span>
               </div>
-              <span style={{ fontWeight: 700, fontSize: 20, color: "#1e3a5f" }}>JointJourney</span>
+              <span style={{ fontWeight: 700, fontSize: 20, color: "#1e3a5f" }}>
+                JointJourney
+              </span>
             </div>
-            <Title level={2} style={{ margin: 0, color: "#111" }}>My Trips</Title>
-            <Text style={{ color: "#666" }}>Plan and manage your adventures</Text>
+            <Title level={2} style={{ margin: 0, color: "#111" }}>
+              My Trips
+            </Title>
+            <Text style={{ color: "#666" }}>
+              Plan and manage your adventures
+            </Text>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             <Button onClick={() => router.push(`/users/${id}`)}>
@@ -170,48 +232,73 @@ const UserTripsDashboard: React.FC = () => {
         </div>
 
         {/* Trip list */}
-        {loading ? (
-          <Card loading />
-        ) : trips.length === 0 ? (
-          <Empty
-            description={
-              <span style={{ color: "#666" }}>
-                No trips yet. Create your first trip or join one with an invite link!
-              </span>
-            }
-          />
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {trips.map((trip) => (
-              <Card
-                key={trip.tripId}
-                hoverable
-                onClick={() => router.push(`/trips/${trip.tripId}`)}
-                style={{ cursor: "pointer", borderLeft: "4px solid #2563eb", borderRadius: 8 }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div>
-                    <Title level={4} style={{ margin: 0, color: "#111" }}>{trip.title}</Title>
-                    {trip.location && (
-                      <Text type="secondary" style={{ display: "block" }}>📍 {trip.location}</Text>
-                    )}
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
-                      <CalendarOutlined style={{ color: "#2563eb", fontSize: 13 }} />
-                      <Text type="secondary" style={{ fontSize: 13 }}>
-                        {formatDate(trip.startDate)} – {formatDate(trip.endDate)}
-                      </Text>
+        {loading ? <Card loading /> : trips.length === 0
+          ? (
+            <Empty
+              description={
+                <span style={{ color: "#666" }}>
+                  No trips yet. Create your first trip or join one with an
+                  invite link!
+                </span>
+              }
+            />
+          )
+          : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {trips.map((trip) => (
+                <Card
+                  key={trip.tripId}
+                  hoverable
+                  onClick={() => router.push(`/trips/${trip.tripId}`)}
+                  style={{
+                    cursor: "pointer",
+                    borderLeft: "4px solid #2563eb",
+                    borderRadius: 8,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <div>
+                      <Title level={4} style={{ margin: 0, color: "#111" }}>
+                        {trip.title}
+                      </Title>
+                      {trip.location && (
+                        <Text type="secondary" style={{ display: "block" }}>
+                          📍 {trip.location}
+                        </Text>
+                      )}
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 6,
+                          marginTop: 4,
+                        }}
+                      >
+                        <CalendarOutlined
+                          style={{ color: "#2563eb", fontSize: 13 }}
+                        />
+                        <Text type="secondary" style={{ fontSize: 13 }}>
+                          {formatDate(trip.startDate)} –{" "}
+                          {formatDate(trip.endDate)}
+                        </Text>
+                      </div>
                     </div>
+                    {trip.adminUsername && (
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        Admin: {trip.adminUsername}
+                      </Text>
+                    )}
                   </div>
-                  {trip.adminUsername && (
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      Admin: {trip.adminUsername}
-                    </Text>
-                  )}
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
+                </Card>
+              ))}
+            </div>
+          )}
       </div>
 
       {/* Create Trip Modal */}
@@ -219,14 +306,24 @@ const UserTripsDashboard: React.FC = () => {
         title={
           <div>
             <div style={{ fontWeight: 700, fontSize: 18 }}>Create New Trip</div>
-            <div style={{ fontWeight: 400, fontSize: 13, color: "#666" }}>Start planning your next adventure</div>
+            <div style={{ fontWeight: 400, fontSize: 13, color: "#666" }}>
+              Start planning your next adventure
+            </div>
           </div>
         }
         open={createModalOpen}
-        onCancel={() => { setCreateModalOpen(false); form.resetFields(); }}
+        onCancel={() => {
+          setCreateModalOpen(false);
+          form.resetFields();
+        }}
         footer={null}
       >
-        <Form form={form} layout="vertical" onFinish={handleCreateTrip} style={{ marginTop: 16 }}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleCreateTrip}
+          style={{ marginTop: 16 }}
+        >
           <Form.Item
             name="title"
             label="Trip Name"
@@ -244,15 +341,19 @@ const UserTripsDashboard: React.FC = () => {
           <Form.Item
             name="dateRange"
             label="Dates"
-            rules={[{ required: true, message: "Start and end date are required" }]}
+            rules={[{
+              required: true,
+              message: "Start and end date are required",
+            }]}
           >
-          <DatePicker.RangePicker
-            style={{ width: "100%" }}
-            size="large"
-            placeholder={["Start Date", "End Date"]}
-            format="DD.MM.YYYY"
-            disabledDate={(current) => current && current.isBefore(dayjs().startOf("day"))}
-          />
+            <DatePicker.RangePicker
+              style={{ width: "100%" }}
+              size="large"
+              placeholder={["Start Date", "End Date"]}
+              format="DD.MM.YYYY"
+              disabledDate={(current) =>
+                current && current.isBefore(dayjs().startOf("day"))}
+            />
           </Form.Item>
           <Form.Item style={{ marginBottom: 0 }}>
             <Button
@@ -274,18 +375,31 @@ const UserTripsDashboard: React.FC = () => {
         title={
           <div>
             <div style={{ fontWeight: 700, fontSize: 18 }}>Join a Trip</div>
-            <div style={{ fontWeight: 400, fontSize: 13, color: "#666" }}>Paste an invite link to join an existing trip</div>
+            <div style={{ fontWeight: 400, fontSize: 13, color: "#666" }}>
+              Paste an invite link to join an existing trip
+            </div>
           </div>
         }
         open={joinModalOpen}
-        onCancel={() => { setJoinModalOpen(false); joinForm.resetFields(); }}
+        onCancel={() => {
+          setJoinModalOpen(false);
+          joinForm.resetFields();
+        }}
         footer={null}
       >
-        <Form form={joinForm} layout="vertical" onFinish={handleJoinTrip} style={{ marginTop: 16 }}>
+        <Form
+          form={joinForm}
+          layout="vertical"
+          onFinish={handleJoinTrip}
+          style={{ marginTop: 16 }}
+        >
           <Form.Item
             name="inviteCode"
             label="Invite Link or Code"
-            rules={[{ required: true, message: "Please paste an invite link or code" }]}
+            rules={[{
+              required: true,
+              message: "Please paste an invite link or code",
+            }]}
           >
             <Input placeholder="Paste invite link or code here" size="large" />
           </Form.Item>
