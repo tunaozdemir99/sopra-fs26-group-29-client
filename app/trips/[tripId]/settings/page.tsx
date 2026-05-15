@@ -4,8 +4,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { App, Button, Card, Popconfirm, Spin, Typography } from "antd";
-import { DeleteOutlined, InfoCircleOutlined, LogoutOutlined } from "@ant-design/icons";
+import { App, Button, Card, Form, Input, Popconfirm, Spin, Typography } from "antd";
+import { DeleteOutlined, EditOutlined, InfoCircleOutlined, LogoutOutlined } from "@ant-design/icons";
 import { Trip } from "@/types/trip";
 
 const { Title, Text } = Typography;
@@ -23,6 +23,9 @@ const SettingsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [leaving, setLeaving] = useState(false);
+  const [isEditingTrip, setIsEditingTrip] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editForm] = Form.useForm();
 
   useEffect(() => {
     if (!token) {
@@ -74,6 +77,35 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  const handleEditTrip = () => {
+    editForm.setFieldsValue({
+      title: trip?.title,
+      location: trip?.location ?? "",
+      startDate: trip?.startDate,
+      endDate: trip?.endDate,
+    });
+    setIsEditingTrip(true);
+  };
+
+  const handleSaveTrip = async (values: { title: string; location: string; startDate: string; endDate: string }) => {
+    setSaving(true);
+    try {
+      const updated = await apiService.patch<Trip>(`/trips/${tripId}`, {
+        title: values.title,
+        location: values.location || null,
+        startDate: values.startDate,
+        endDate: values.endDate,
+      });
+      setTrip(updated);
+      setIsEditingTrip(false);
+      message.success("Trip details updated");
+    } catch (error) {
+      const e = error as Error;
+      message.error(e.message ?? "Failed to update trip");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const isAdmin = String(userId) === String(trip?.adminId);
   const isOnlyMember = isAdmin && memberCount === 1;
@@ -109,6 +141,81 @@ const SettingsPage: React.FC = () => {
         </div>
       </Card>
 
+      {/* Edit trip details — admin only */}
+      {isAdmin && (
+        <Card style={{ marginBottom: 16 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <Title level={4} style={{ margin: 0 }}>
+              <EditOutlined /> Edit Trip Details
+            </Title>
+            {!isEditingTrip && (
+              <Button icon={<EditOutlined />} onClick={handleEditTrip}>
+                Edit
+              </Button>
+            )}
+          </div>
+
+          {isEditingTrip ? (
+            <Form form={editForm} layout="vertical" onFinish={handleSaveTrip}>
+              <Form.Item
+                name="title"
+                label="Title"
+                rules={[{ required: true, message: "Title is required" }]}
+              >
+                <Input placeholder="Trip title" />
+              </Form.Item>
+              <Form.Item name="location" label="Location">
+                <Input placeholder="Destination (optional)" />
+              </Form.Item>
+              <Form.Item
+                name="startDate"
+                label="Start Date"
+                rules={[{ required: true, message: "Start date is required" }]}
+              >
+                <Input type="date" />
+              </Form.Item>
+              <Form.Item
+                name="endDate"
+                label="End Date"
+                rules={[{ required: true, message: "End date is required" }]}
+              >
+                <Input type="date" />
+              </Form.Item>
+              <Form.Item style={{ marginBottom: 0 }}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={saving}
+                  style={{ marginRight: 8, background: "#111", borderColor: "#111" }}
+                >
+                  Save
+                </Button>
+                <Button onClick={() => setIsEditingTrip(false)}>Cancel</Button>
+              </Form.Item>
+            </Form>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div>
+                <Text type="secondary">Title</Text>
+                <br />
+                <Text>{trip.title}</Text>
+              </div>
+              {trip.location && (
+                <div>
+                  <Text type="secondary">Location</Text>
+                  <br />
+                  <Text>{trip.location}</Text>
+                </div>
+              )}
+              <div>
+                <Text type="secondary">Dates</Text>
+                <br />
+                <Text>{trip.startDate} – {trip.endDate}</Text>
+              </div>
+            </div>
+          )}
+        </Card>
+      )}
 
       {/* Leave Trip — all members */}
       <Card style={{ marginBottom: 16 }}>
