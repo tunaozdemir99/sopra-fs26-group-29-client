@@ -4,12 +4,13 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useApi } from "@/hooks/useApi";
-import { App, Button, Card, Spin, Tabs, Tooltip, Typography } from "antd";
+import { App, Button, Card, Input, Modal, Spin, Tabs, Typography } from "antd";
 import {
   ArrowLeftOutlined,
   CalendarOutlined,
-  ShareAltOutlined,
-  TeamOutlined,
+  CopyOutlined,
+  ReloadOutlined,
+  UserAddOutlined,
 } from "@ant-design/icons";
 import { Trip } from "@/types/trip";
 
@@ -25,6 +26,11 @@ function TripLayoutInner({ children }: { children: React.ReactNode }) {
   const { value: userId } = useLocalStorage<string>("userId", "");
   const [trip, setTrip] = useState<Trip | null>(null);
   const [loading, setLoading] = useState(true);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [inviteUsername, setInviteUsername] = useState("");
+  const [addingMember, setAddingMember] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
+  const [deactivating, setDeactivating] = useState(false);
   const isAdmin = trip ? String(userId) === String(trip.adminId) : false;
 
   useEffect(() => {
@@ -60,9 +66,53 @@ function TripLayoutInner({ children }: { children: React.ReactNode }) {
   const handleCopyInvite = () => {
     if (trip?.inviteUrl) {
       const url = `${window.location.origin}/invite/${trip.inviteUrl}`;
-      navigator.clipboard.writeText(url).then(() =>
-        message.success("Invite link copied!")
-      );
+      navigator.clipboard.writeText(url).then(() => message.success("Invite link copied!"));
+    }
+  };
+
+  const handleRegenerateLink = async () => {
+    setRegenerating(true);
+    try {
+      const res = await apiService.put<{ inviteUrl: string }>(`/trips/${tripId}/invite`, {});
+      if (trip?.inviteActive === false) {
+        await apiService.patch(`/trips/${tripId}/invite`, { active: true });
+      }
+      setTrip((prev) => prev ? { ...prev, inviteUrl: res.inviteUrl, inviteActive: true } : prev);
+      message.success("Invite link regenerated!");
+    } catch (error) {
+      const e = error as Error;
+      message.error(e.message ?? "Failed to regenerate link");
+    } finally {
+      setRegenerating(false);
+    }
+  };
+
+  const handleDeactivateLink = async () => {
+    setDeactivating(true);
+    try {
+      await apiService.patch(`/trips/${tripId}/invite`, { active: false });
+      setTrip((prev) => prev ? { ...prev, inviteActive: false } : prev);
+      message.success("Invite link deactivated");
+    } catch (error) {
+      const e = error as Error;
+      message.error(e.message ?? "Failed to deactivate link");
+    } finally {
+      setDeactivating(false);
+    }
+  };
+
+  const handleAddMember = async () => {
+    if (!inviteUsername.trim()) return;
+    setAddingMember(true);
+    try {
+      await apiService.post(`/trips/${tripId}/members`, { username: inviteUsername.trim() });
+      setInviteUsername("");
+      message.success("Member added!");
+    } catch (error) {
+      const e = error as Error;
+      message.error(e.message ?? "Failed to add member");
+    } finally {
+      setAddingMember(false);
     }
   };
 
@@ -203,34 +253,14 @@ function TripLayoutInner({ children }: { children: React.ReactNode }) {
                 gap: 8,
               }}
             >
-              {trip?.adminUsername && (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                    background: "#eff6ff",
-                    padding: "4px 12px",
-                    borderRadius: 20,
-                    border: "1px solid #bfdbfe",
-                  }}
+              {isAdmin && (
+                <Button
+                  icon={<UserAddOutlined />}
+                  onClick={() => setInviteModalOpen(true)}
+                  style={{ background: "#111", color: "#fff", border: "none", borderRadius: 8 }}
                 >
-                  <TeamOutlined style={{ color: "#2563eb", fontSize: 13 }} />
-                  <Text style={{ fontSize: 12, color: "#2563eb" }}>
-                    Admin: {trip.adminUsername}
-                  </Text>
-                </div>
-              )}
-              {trip?.inviteUrl && isAdmin && (
-                <Tooltip title="Copy invite link to share with others">
-                  <Button
-                    icon={<ShareAltOutlined />}
-                    size="small"
-                    onClick={handleCopyInvite}
-                  >
-                    Share Trip
-                  </Button>
-                </Tooltip>
+                  Invite Members
+                </Button>
               )}
             </div>
           </div>
@@ -250,6 +280,71 @@ function TripLayoutInner({ children }: { children: React.ReactNode }) {
           />
         </Card>
       </div>
+
+      <Modal
+        title={
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 16 }}>Invite Members</div>
+            <div style={{ fontWeight: 400, fontSize: 13, color: "#666" }}>
+              Add trip members by entering their username or share the invite link
+            </div>
+          </div>
+        }
+        open={inviteModalOpen}
+        onCancel={() => { setInviteModalOpen(false); setInviteUsername(""); }}
+        footer={null}
+        width={480}
+      >
+        <div style={{ marginBottom: 8, fontWeight: 600 }}>Username</div>
+        <Input
+          placeholder="Enter username"
+          value={inviteUsername}
+          onChange={(e) => setInviteUsername(e.target.value)}
+          onPressEnter={handleAddMember}
+          style={{ marginBottom: 4 }}
+        />
+        <div style={{ fontSize: 12, color: "#888", marginBottom: 16 }}>
+          Enter the unique username of the person you want to add
+        </div>
+        <Button
+          type="primary"
+          block
+          loading={addingMember}
+          disabled={!inviteUsername.trim()}
+          onClick={handleAddMember}
+          style={{ background: "#111", color: "#fff", border: "none", borderRadius: 8, marginBottom: 20, height: 40 }}
+        >
+          Add Member
+        </Button>
+
+        <div style={{ textAlign: "center", color: "#aaa", fontSize: 12, marginBottom: 16, letterSpacing: 1 }}>
+          OR SHARE LINK
+        </div>
+
+        <div style={{ fontWeight: 600, marginBottom: 8 }}>Invite Link</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <Input
+            value={trip?.inviteUrl ? `${window.location.origin}/invite/${trip.inviteUrl}` : ""}
+            readOnly
+            disabled={trip?.inviteActive === false}
+            style={{ flex: 1 }}
+          />
+          <Button icon={<CopyOutlined />} onClick={handleCopyInvite} disabled={trip?.inviteActive === false} />
+          <Button icon={<ReloadOutlined />} loading={regenerating} onClick={handleRegenerateLink} />
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ fontSize: 12, color: "#888" }}>
+            {trip?.inviteActive !== false
+              ? "Anyone with this link can join the trip if they have an account."
+              : "Link is deactivated. Regenerate to create a new active link."}
+          </div>
+          {trip?.inviteActive !== false && (
+            <Button danger size="small" loading={deactivating} onClick={handleDeactivateLink}>
+              Deactivate
+            </Button>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }
