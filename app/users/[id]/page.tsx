@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
+import { ApplicationError } from "@/types/error";
 import { Button, Form, Input, Typography } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 
@@ -47,13 +48,16 @@ const Profile: React.FC = () => {
         const fetchedUser = await apiService.get<User>(`/users/${params.id}`);
         setUser(fetchedUser);
       } catch (error) {
-        if (error instanceof Error) {
+        const appError = error as ApplicationError;
+        if (appError.status === 401) {
+          router.push("/login");
+        } else if (error instanceof Error) {
           alert(`Failed to load profile:\n${error.message}`);
         }
       }
     };
     if (params.id) fetchUser();
-  }, [apiService, params.id]);
+  }, [apiService, params.id, router]);
 
   const handleLogout = async () => {
     try {
