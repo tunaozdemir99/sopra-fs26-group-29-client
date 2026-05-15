@@ -4,8 +4,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { App, Button, Card, Input, Popconfirm, Spin, Typography } from "antd";
-import { DeleteOutlined, InfoCircleOutlined, LinkOutlined, LogoutOutlined } from "@ant-design/icons";
+import { App, Button, Card, Popconfirm, Spin, Typography } from "antd";
+import { DeleteOutlined, InfoCircleOutlined, LogoutOutlined } from "@ant-design/icons";
 import { Trip } from "@/types/trip";
 
 const { Title, Text } = Typography;
@@ -109,88 +109,6 @@ const SettingsPage: React.FC = () => {
         </div>
       </Card>
 
-      {/* Invite link management — admin only */}
-      {isAdmin && (
-        <Card style={{ marginBottom: 16 }}>
-          <Title level={4}>
-            <LinkOutlined /> Invite Link
-          </Title>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 12,
-            }}
-          >
-            <Input
-              value={trip.inviteActive
-                ? `${window.location.origin}/invite/${trip.inviteUrl}`
-                : "Invite link is deactivated"}
-              readOnly
-              disabled={!trip.inviteActive}
-            />
-            <Button
-              onClick={() => {
-                const url =
-                  `${window.location.origin}/invite/${trip.inviteUrl}`;
-                navigator.clipboard.writeText(url).then(() =>
-                  message.success("Copied!")
-                );
-              }}
-              disabled={!trip.inviteActive}
-            >
-              Copy
-            </Button>
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <Button
-              onClick={async () => {
-                try {
-                  const res = await apiService.put<{ inviteUrl: string }>(
-                    `/trips/${tripId}/invite`,
-                    {},
-                  );
-                  setTrip((prev) =>
-                    prev ? { ...prev, inviteUrl: res.inviteUrl } : prev
-                  );
-                  message.success("Invite link regenerated!");
-                } catch (error) {
-                  const e = error as Error;
-                  message.error(e.message ?? "Failed to regenerate");
-                }
-              }}
-              disabled={!trip.inviteActive}
-            >
-              Regenerate Link
-            </Button>
-            <Button
-              danger={trip.inviteActive}
-              type={trip.inviteActive ? "default" : "primary"}
-              onClick={async () => {
-                try {
-                  await apiService.patch(`/trips/${tripId}/invite`, {
-                    active: !trip.inviteActive,
-                  });
-                  setTrip((prev) =>
-                    prev ? { ...prev, inviteActive: !prev.inviteActive } : prev
-                  );
-                  message.success(
-                    trip.inviteActive
-                      ? "Invite deactivated"
-                      : "Invite activated",
-                  );
-                } catch (error) {
-                  const e = error as Error;
-                  message.error(e.message ?? "Failed to update invite");
-                }
-              }}
-            >
-              {trip.inviteActive ? "Deactivate" : "Activate"}
-            </Button>
-          </div>
-        </Card>
-      )}
 
       {/* Leave Trip — all members */}
       <Card style={{ marginBottom: 16 }}>
